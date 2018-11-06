@@ -91,7 +91,6 @@ class phyloHMRF(_BaseGraph):
 		self.beta1 = beta1	# regularization coefficient for edge potential
 		self.type_id = type_id
 
-		#self.state_id = 0
 		self.observation = observation
 		self.observation_mtx = observation_mtx
 		print "data loaded", self.observation.shape
@@ -121,9 +120,6 @@ class phyloHMRF(_BaseGraph):
 		# self.cost_H, self.cost_V = self._edge_weight_grid(self.edge_idList_undirected, self.edge_weightList_undirected)
 
 		self.tree_mtx, self.node_num = self._initilize_tree_mtx(edge_list)
-		# self.branch_dim, self.n_params = self.node_num, self.node_num
-		# self.branch_params = 2*np.ones((n_components,self.branch_dim))+0*np.random.rand(n_components,self.branch_dim)
-		# self.branch_params = np.ones((n_components, self.node_num))
 		self.branch_params = branch_list
 		# self.branch_dim = len(branch_list)
 		self.branch_dim = self.node_num - 1   # number of branches
@@ -136,11 +132,7 @@ class phyloHMRF(_BaseGraph):
 
 		print "branch dim", self.branch_dim
 		print "number of parameters", self.n_params
-		# self.branch_vec = [None]*self.node_num
-		# self.branch_vec = [None]*self.node_num
 		self.branch_vec = [None]*self.node_num  # all the leaf nodes that can be reached from a node
-		# self.branch_vec = [None]*self.node_num
-		# self.params_vec1 = np.random.rand(n_components, self.n_params) # this needs to be updated
 
 		self.base_struct = [None]*self.node_num
 		print "compute base struct"
@@ -152,8 +144,6 @@ class phyloHMRF(_BaseGraph):
 		self.leaf_time = branch_list[0]+branch_list[1]  # this needs to be updated
 		self.leaf_vec = self._search_leaf()  # search for the leaves of the tree
 		self.path_vec = self._search_ancestor()
-
-		# self.cv = np.zeros((self.n_features, self.n_features))
 
 		mtx = np.zeros((n_features,n_features))
 		print "initilization, branch parameters", self.branch_params
@@ -173,8 +163,6 @@ class phyloHMRF(_BaseGraph):
 		# self.posteriors = posteriors/(np.reshape(den1,(self.n_samples,1))*np.ones((1,n_components)))
 		self.posteriors = np.ones((self.n_samples,n_components))    # for testing
 		self.mean = np.random.rand(n_components, self.n_features)   # for testing
-		#self.mean = tf.placeholder(tf.float32, [n_components, self.n_features])
-		# self.Sn_w = np.zeros((self.n_components, self.n_features, self.n_features))
 		
 		self.stats = dict()
 		self.counter = 0
@@ -208,7 +196,7 @@ class phyloHMRF(_BaseGraph):
 	covars_ = property(_get_covars, _set_covars)
 
 	def _check(self):
-		super(phyloHMM1, self)._check()
+		super(phyloHMRF, self)._check()
 
 		self.means_ = np.asarray(self.means_)
 		self.n_features = self.means_.shape[1]
@@ -247,7 +235,7 @@ class phyloHMRF(_BaseGraph):
 		return init_ou_params
 
 	def _init(self, X, lengths=None):
-		super(phyloHMM1, self)._init(X, lengths=lengths)
+		super(phyloHMRF, self)._init(X, lengths=lengths)
 		
 		# _, n_features = X.shape
 		dim = X.shape
@@ -287,9 +275,6 @@ class phyloHMRF(_BaseGraph):
 			X, self.means_, self._covars_, self.covariance_type)
 
 	def _compute_posteriors_graph1(self, X, label):
-		#log_prob = log_multivariate_normal_density(
-		#	X, self.means_, self._covars_, self.covariance_type)
-
 		prob = np.exp(self.logprob)	# self.logprob should have been updated with the current model parameters
 		pairwise_prob = self._pairwise_compare(label)
 		weighted_prob = prob*pairwise_prob
@@ -300,11 +285,6 @@ class phyloHMRF(_BaseGraph):
 		return posteriors
 
 	def _compute_posteriors_graph_v1(self, X, label):
-		#log_prob = log_multivariate_normal_density(
-		#	X, self.means_, self._covars_, self.covariance_type)
-
-		# prob = np.exp(self.logprob)	# self.logprob should have been updated with the current model parameters
-		# pairwise_prob = self._pairwise_compare(label)
 		pairwise_potential = self._pairwise_compare(label)
 		weighted_prob = np.exp(self.logprob - pairwise_potential)
 		sum1 = np.sum(weighted_prob,axis=1).reshape((-1,1))
@@ -331,11 +311,6 @@ class phyloHMRF(_BaseGraph):
 		return (s1,s2,temp1)
 
 	def _compute_posteriors_graph_v1(self, X, label, logprob, region_id):
-		#log_prob = log_multivariate_normal_density(
-		#	X, self.means_, self._covars_, self.covariance_type)
-
-		# prob = np.exp(self.logprob)	# self.logprob should have been updated with the current model parameters
-		# pairwise_prob = self._pairwise_compare(label)
 
 		self.neighbor_vec = self.neighbor_vec2[region_id]
 		self.edge_index = self.edge_index_vec[region_id]
@@ -997,7 +972,7 @@ class phyloHMRF(_BaseGraph):
 							   random_state=random_state)
 
 	def _initialize_sufficient_statistics(self):
-		stats = super(phyloHMM1, self)._initialize_sufficient_statistics()
+		stats = super(phyloHMRF, self)._initialize_sufficient_statistics()
 		stats['post'] = np.zeros(self.n_components)
 		stats['obs'] = np.zeros((self.n_components, self.n_features))
 		stats['obs**2'] = np.zeros((self.n_components, self.n_features))
@@ -1007,7 +982,7 @@ class phyloHMRF(_BaseGraph):
 
 	def _accumulate_sufficient_statistics(self, stats, obs, framelogprob,
 										  posteriors):
-		super(phyloHMM1, self)._accumulate_sufficient_statistics(
+		super(phyloHMRF, self)._accumulate_sufficient_statistics(
 			stats, obs, framelogprob, posteriors)
 
 		if 'm' in self.params or 'c' in self.params:
@@ -1849,7 +1824,7 @@ class phyloHMRF(_BaseGraph):
 		return flag, params1
 
 	def _do_mstep(self, stats):
-		super(phyloHMM1, self)._do_mstep(stats)
+		super(phyloHMRF, self)._do_mstep(stats)
 
 		self.stats = stats.copy()
 		means_prior = self.means_prior
