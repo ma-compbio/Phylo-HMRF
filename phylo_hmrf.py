@@ -2249,40 +2249,40 @@ def run(hmm_estimate,num_states,filename,length_vec,root_path,multiple,species_n
 
 	sym_Idx = utility1.symmetric_idx(dim1,dim2) 
 
-		tree1 = phyloHMM1(n_components=n_components1, run_id=run_id, n_samples = n_samples_accumulate, n_features = samples[0].shape[-1], 
-					 n_dim1 = dim[0], n_dim2 = dim[1], 
-					 observation=samples, observation_mtx=mtx1, edge_list=edge_list, len_vec = len_vec, type_id=version, branch_list=branch_list, edge_list_1 = edge_list_vec, 
-					 cons_param=cons_param, beta = beta, beta1 = beta1, initial_mode = initial_mode, 
-					 initial_weight = initial_weight, initial_weight1 = initial_weight1, initial_magnitude = initial_magnitude, 
-					 learning_rate=learning_rate, estimate_type = estimate_type, max_iter = 100, n_iter=5000, tol=1e-7)
+	tree1 = phyloHMM1(n_components=n_components1, run_id=run_id, n_samples = n_samples_accumulate, n_features = samples[0].shape[-1], 
+				n_dim1 = dim[0], n_dim2 = dim[1], 
+				observation=samples, observation_mtx=mtx1, edge_list=edge_list, len_vec = len_vec, type_id=version, branch_list=branch_list, edge_list_1 = edge_list_vec, 
+				cons_param=cons_param, beta = beta, beta1 = beta1, initial_mode = initial_mode, 
+				initial_weight = initial_weight, initial_weight1 = initial_weight1, initial_magnitude = initial_magnitude, 
+				learning_rate=learning_rate, estimate_type = estimate_type, max_iter = 100, n_iter=5000, tol=1e-7)
 
-		threshold = conv_threshold
-		print threshold
+	threshold = conv_threshold
+	print threshold
 
-		print "fit_v5_accumulate_test"
+	print "fit_v5_accumulate_test"
 
-		params_vec, params_vec1, params_vecList, state_vecList, iter_id1, iter_id2, cost_vec = tree1.fit_v5_accumulate_test3a(samples, len_vec, threshold)
+	params_vec, params_vec1, params_vecList, state_vecList, iter_id1, iter_id2, cost_vec = tree1.fit_v5_accumulate_test3a(samples, len_vec, threshold)
 
-		lambda_0 = cons_param
+	lambda_0 = cons_param
 
-		print "predicting states..."
+	print "predicting states..."
 		
-		annot2 = 'chr%s.local.test5.graphcut.joint1.%d.%d.%s'%(chrom,position1,position2,annotation)
-		# state_est = state_est.reshape((len(state_est),1))
-		# state_est = np.hstack((t_position,state_est))
+	annot2 = 'chr%s.local.test5.graphcut.joint1.%d.%d.%s'%(chrom,position1,position2,annotation)
+	# state_est = state_est.reshape((len(state_est),1))
+	# state_est = np.hstack((t_position,state_est))
 
-		path_1 = "/volume01/yy3/replication_timing/em1/data1"
+	path_1 = "./"
 
-		# save the estimated states and parameters
-		filename3 = "%s/estimate_ou_%d_%.2f_%d_s%d.%s.txt"%(path_1, run_id, lambda_0, n_components1, version, annot2)
+	# save the estimated states and parameters
+	filename3 = "%s/estimate_ou_%d_%.2f_%d_s%d.%s.txt"%(path_1, run_id, lambda_0, n_components1, version, annot2)
 
-		mdict = {}
-		mdict['params_vecList'] = params_vecList
-		mdict['state_vecList'] = state_vecList
-		mdict['params_vec'], mdict['params_vec1'], mdict['iter_id1'], mdict['iter_id2'], mdict['cost_vec'] = params_vec, params_vec1, iter_id1, iter_id2, cost_vec
-		filename3 = "%s/estimate_ou_%d_%.2f_%d_s%d.%s.mat"%(path_1, run_id, lambda_0, n_components1, version, annot2)
-		scipy.io.savemat(filename3,mdict)
-		print params_vecList.shape
+	mdict = {}
+	mdict['params_vecList'] = params_vecList
+	mdict['state_vecList'] = state_vecList
+	mdict['params_vec'], mdict['params_vec1'], mdict['iter_id1'], mdict['iter_id2'], mdict['cost_vec'] = params_vec, params_vec1, iter_id1, iter_id2, cost_vec
+	filename3 = "%s/estimate_ou_%d_%.2f_%d_s%d.%s.mat"%(path_1, run_id, lambda_0, n_components1, version, annot2)
+	scipy.io.savemat(filename3,mdict)
+	print params_vecList.shape
 
 	end = time.time()
 	print "use time:"
