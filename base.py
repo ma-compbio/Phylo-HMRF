@@ -330,12 +330,6 @@ class _BaseGraph(BaseEstimator):
 			print("use time %d:"%(iter))
 			print(end - start)
 
-			# # m_queue.put((region_id, labels, posteriors, t_pairwise_cost1, t_pairwise_cost, t_unary_cost, t_cost1))
-			# # m_queue.put((region_id, stats, t_pairwise_cost1, t_pairwise_cost, t_unary_cost, t_cost1))
-			# # m_queue.put((region_id, stats, labels, t_pairwise_cost1, t_pairwise_cost, t_unary_cost, t_cost1))
-			# results = [self.queue.get() for p in processes]
-			# print(results)
-
 			pairwise_cost1, pairwise_cost, unary_cost, cost1 = 0, 0, 0, 0
 			
 			id1 = 3
