@@ -2111,7 +2111,7 @@ def run(hmm_estimate,num_states,filename,length_vec,root_path,multiple,species_n
 	print "estimate type %d"%(estimate_type)
 
 	# load the edge list
-	data_path = "/volume01/yy3/seq_data/HiC3_1"
+	data_path = "."
 	filename2 = "%s/edge.1.txt"%(data_path)
 	if(os.path.exists(filename2)==True):
 		f = open(filename2, 'r')
@@ -2127,8 +2127,6 @@ def run(hmm_estimate,num_states,filename,length_vec,root_path,multiple,species_n
 		branch_list = [map(float,line.split('\t')) for line in f]
 		branch_list = branch_list[0]
 		print branch_list
-
-	path_1 = "/volume01/yy3/replication_timing/em1"
 
 	chrom = str(filename)
 	# chrom = "1"
@@ -2173,7 +2171,6 @@ def run(hmm_estimate,num_states,filename,length_vec,root_path,multiple,species_n
 	edge_list_vec = []
 	
 	samples = []
-	# sample_id = []
 	len_vec = []
 	id1, id2 = 0, 0
 	n_samples_accumulate = 0
@@ -2238,7 +2235,7 @@ def run(hmm_estimate,num_states,filename,length_vec,root_path,multiple,species_n
 	start = time.time()
 
 	path_1 = "."
-	annot = "phylo-hmgp"
+	annot = "phylo-hmrf"
 	
 	if not os.path.exists(path_1):
 		try:
@@ -2259,15 +2256,13 @@ def run(hmm_estimate,num_states,filename,length_vec,root_path,multiple,species_n
 	threshold = conv_threshold
 	print threshold
 
-	print "fit_v5_accumulate_test"
-
 	params_vec, params_vec1, params_vecList, state_vecList, iter_id1, iter_id2, cost_vec = tree1.fit_accumulate(samples, len_vec, threshold)
 
 	lambda_0 = cons_param
 
 	print "predicting states..."
 		
-	annot2 = 'chr%s.local.test5.graphcut.joint1.%d.%d.%s'%(chrom,position1,position2,annotation)
+	annot2 = 'chr%s.graphcut.joint.%d.%d.%s'%(chrom,position1,position2,annotation)
 	# state_est = state_est.reshape((len(state_est),1))
 	# state_est = np.hstack((t_position,state_est))
 
