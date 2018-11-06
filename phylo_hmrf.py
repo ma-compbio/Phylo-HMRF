@@ -2261,7 +2261,7 @@ def run(hmm_estimate,num_states,filename,length_vec,root_path,multiple,species_n
 
 	print "fit_v5_accumulate_test"
 
-	params_vec, params_vec1, params_vecList, state_vecList, iter_id1, iter_id2, cost_vec = tree1.fit_v5_accumulate_test3a(samples, len_vec, threshold)
+	params_vec, params_vec1, params_vecList, state_vecList, iter_id1, iter_id2, cost_vec = tree1.fit_accumulate(samples, len_vec, threshold)
 
 	lambda_0 = cons_param
 
