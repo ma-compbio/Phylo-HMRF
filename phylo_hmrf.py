@@ -11,9 +11,7 @@ from sklearn.mixture import (
 from sklearn.mixture import GaussianMixture
 from sklearn.utils import check_random_state
 
-from base import _BaseHMM
 from base import _BaseGraph
-from utils import iter_from_X_lengths, normalize
 
 import pandas as pd
 import numpy as np
@@ -48,7 +46,7 @@ import warnings
 import time
 
 
-__all__ = ["PhyloHMM", "GMMHMM", "GaussianHMM", "MultinomialHMM"]
+__all__ = ["PhyloHMRF"]
 
 COVARIANCE_TYPES = frozenset(("linear","spherical", "diag", "full", "tied"))
 
