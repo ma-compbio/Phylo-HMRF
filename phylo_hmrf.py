@@ -510,8 +510,6 @@ class phyloHMRF(_BaseGraph):
 		flag = 0
 
 		n_components = self.n_components
-		# beta = 0.1
-		# idx = self.neighbor_vec[i]
 		idx = neighbor_vec[i]
 		vec1 = np.asarray(label[idx])
 		
@@ -648,7 +646,6 @@ class phyloHMRF(_BaseGraph):
 
 		print self.n_dim1, self.n_dim2
 		D = weights.reshape((self.n_dim1,self.n_dim2,self.n_components))
-		# beta = 0.1
 		max_cycles1 = 5000
 		print D.shape
 
@@ -713,7 +710,6 @@ class phyloHMRF(_BaseGraph):
 
 		print self.n_dim1, self.n_dim2
 		unary_cost1 = unary_cost1.reshape((self.n_dim1,self.n_dim2,self.n_components))
-		# beta = 0.1
 		max_cycles1 = 5000
 		print unary_cost1.shape
 
@@ -797,7 +793,6 @@ class phyloHMRF(_BaseGraph):
 		n_edges = len(self.edge_list_1)
 		edge_list_1 = self.edge_list_1
 		beta1 = self.beta1
-		#beta1 = 0.1
 		edge_weightList = np.zeros(n_edges)
 
 		X_norm = np.sqrt(np.sum(X*X,axis=1))
@@ -805,11 +800,8 @@ class phyloHMRF(_BaseGraph):
 		for k in range(0,n_edges):
 			j, i = edge_list_1[k,0], edge_list_1[k,1]
 			x1, x2 = X[j], X[i]
-			#if i%100==0:
-			#	print x1, x2 
 			difference = np.dot(x1-x2,(x1-x2).T)
 			temp1 = difference/(X_norm[i]*X_norm[j])
-			# temp1 = difference
 			edge_weightList[k] = np.exp(-beta1*temp1)
 
 		#self.edge_weightList = edge_weightList
@@ -865,7 +857,6 @@ class phyloHMRF(_BaseGraph):
 		beta1 = self.beta1
 		n_samples = len(X)
 		n_edges = len(edge_list_1)
-		#beta1 = 0.1 # setting beta1 
 		edge_weightList = np.zeros(n_edges)
 
 		if n_edges%2!=0:
@@ -883,10 +874,7 @@ class phyloHMRF(_BaseGraph):
 			temp1 = difference/(X_norm[i]*X_norm[j]+small_eps)
 			
 			edge_weightList[k] = np.exp(-beta1*temp1)
-			# if j<i:
-			# 	edge_idList_undirected[cnt] = [j,i]
-			# 	edge_weightList_undirected[cnt] = edge_weightList[i]
-			# 	cnt = cnt+1
+
 		b = np.where(edge_list_1[:,0]<edge_list_1[:,1])[0]
 		print "id1<id2:%d"%(len(b))
 		edge_idList_undirected = edge_list_1[b]
@@ -1211,7 +1199,6 @@ class phyloHMRF(_BaseGraph):
 		N1 = int(n1*(n1-1)/2)
 
 		print N1, N2
-		# common_ans = np.zeros((N1,1))
 		pair_list, parent_list = [], [None]*n2
 
 		A1 = np.zeros((n1,n2))  # leaf node number by branch dim
@@ -1306,8 +1293,6 @@ class phyloHMRF(_BaseGraph):
 		for i in range(0,n1):
 			covar_mtx[i,i] = values[self.leaf_vec[i],1] # variance
 		
-		# sigma1 = sigma**2
-		# V1 = 1.0/a1*np.exp(-a1*(T-cv))*(1-np.exp(-a1*cv))
 		V = covar_mtx.copy()
 		theta = theta1[self.leaf_vec]
 		mean_values1 = values[self.leaf_vec,0]
@@ -1404,13 +1389,8 @@ class phyloHMRF(_BaseGraph):
 
 		values = np.zeros((n2,2))	# expectation and variance
 		covar_mtx = np.zeros((n1,n1))
-		# beta1, lambda1 = params1['beta'], params1['lambda']  # alpha*t, sigma^2*t
-		# beta1, lambda1 = np.insert(beta1,0,0), np.insert(lambda1,0,0)  # add a branch for the first node
-
-		# alpha, sigma, theta0, theta1 = params[0], params[1], params[2], params[3:num1]
 
 		num1 = self.branch_dim  # number of branches; assign parameters to each of the branches
-		# alpha, sigma, theta1 = params[0:num1], params[num1:2*num1], params1[2*num1:3*num1+1]
 		params1 = params[1:]
 		beta1, lambda1, theta1 = params1[0:num1], params1[num1:2*num1], params1[2*num1:3*num1+1]
 
@@ -1829,25 +1809,14 @@ class phyloHMRF(_BaseGraph):
 		means_weight = self.means_weight
 
 		print "M_step"
-		# TODO: find a proper reference for estimates for different
-		#       covariance models.
-		# Based on Huang, Acero, Hon, "Spoken Language Processing",
-		# p. 443 - 445
 		denom = stats['post'][:, np.newaxis]
 		#self._output_stats(self.counter)
 		#self.counter += 1
 
 		print denom
-		# if 'm' in self.params:
-		#     print "flag: true mean"
-		#     self.means_ = ((means_weight * means_prior + stats['obs'])
-		#                    / (means_weight + denom))
 
 		if 'c' in self.params:
 			print "flag: true covariance"
-			# covars_prior = self.covars_prior
-			# covars_weight = self.covars_weight
-			# meandiff = self.means_ - means_prior
 
 			for c in range(self.n_components):
 				print "state_id: %d"%(c)
@@ -1951,66 +1920,6 @@ class phyloHMRF(_BaseGraph):
 			print covar_mtx[i]
 
 		return n_components, start_prob, equili_prob, transmat, mean_values, covar_mtx
-
-	# simulate sequence from the defined covariance matrix and mean values
-	def _generate_sequence(self, n_samples, filename1):
-		
-		n_components2, start_prob, transmat, mean_values, covar_mtx = self._load_simu_parameters(filename1)
-		np.random.seed(42)
-		model = hmm.GaussianHMM(n_components=n_components2, covariance_type="full")
-		model.startprob_ = np.array(start_prob)
-
-		model.transmat_ = np.array(transmat)
-		model.means_ = np.array(mean_values)
-		model.covars_ = covar_mtx.copy()
-		x, z = model.sample(n_samples)
-
-		return x, z
-
-	def _generate_sequence_distribution(self, n_samples, filename1, len_mean, len_std):
-		
-		n_components, startprob_, equiliprob_, transmat, mean_values, covar_mtx = self._load_simu_parameters(filename1)
-		print equiliprob_
-		# sample segment length
-		# np.random.seed(42)
-		# model = hmm.GaussianHMM(n_components=n_components2, covariance_type="full")
-
-		n_features = mean_values.shape[1]
-		
-		x, y = np.zeros((n_samples,n_features)), np.zeros(n_samples)
-		n_samples1 = 0
-		
-		if equiliprob_.shape[0]!=n_components:
-			print "state number not equal! %d %d"%(equiliprob_.shape[0], n_components)
-
-		if np.sum(equiliprob_)!=1:
-			print "Error: probabilities not sum to 1"
-			equiliprob_ = equiliprob_/np.sum(equiliprob_)
-			print equiliprob_
-
-		prob_vec = np.zeros(n_components+1)
-		for i in range(0,n_components):
-			prob_vec[i+1] = prob_vec[i] + equiliprob_[i]
-
-		len_vec = []
-		while n_samples1 < n_samples:
-			t1 = np.random.rand(1)[0]
-			b = np.where(np.logical_and(t1<=prob_vec[1:],t1>prob_vec[0:-1]))[0]
-			state_id = b[0]
-			region_len = int(np.max((5,np.random.normal(len_mean, len_std))))
-			region_len = int(np.min((200,region_len)))
-			if region_len > n_samples-n_samples1:
-				region_len = n_samples-n_samples1 
-			x1 = sample_gaussian(mean_values[state_id], covar_mtx[state_id], covariance_type='full', n_samples=region_len)
-			x[n_samples1:n_samples1+region_len,:] = x1.T
-			y[n_samples1:n_samples1+region_len] = state_id
-			n_samples1 = n_samples1+region_len
-			len_vec.append(region_len)
-
-		n_segment = len(len_vec)
-		print "segment number: %d; average segment length: %.2f; max segment length: %.2f; min segment length: %.2f"%(n_segment, np.mean(len_vec), np.max(len_vec), np.min(len_vec))
-
-		return x, y
 
 	def _simu_paramters(n_samples, filename1):
 		n_components2, equili_prob, transmat, mean_values, covar_mtx = self._load_simu_parameters(filename1)
