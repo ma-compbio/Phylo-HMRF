@@ -1,4 +1,4 @@
-# Hidden Markov Random Field Model
+# Phylogenetic Hidden Markov Random Field Model
 
 import numpy as np
 from scipy.misc import logsumexp
