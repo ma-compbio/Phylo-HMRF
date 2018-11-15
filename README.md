@@ -16,6 +16,8 @@ The options:
 
 - --num_neighbor : the number of neighbors of each node in the neighborhood system, default = 8
 
+- -g, --estimate_type : the choice to consider edge weights in pairwise potential: 0: not consider edge weights; 3: consider edge weights, default = 3
+
 - -b, --beta : the pairwise potentional parameter beta_0, default = 1
 
 - --beta1 : the pairwise potential parameter beta_1, default = 0.1
