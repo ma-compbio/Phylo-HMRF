@@ -1958,11 +1958,10 @@ class phyloHMRF(_BaseGraph):
 
 def parse_args():
 	parser = OptionParser(usage="Replication timing state estimation", add_help_option=False)
-	parser.add_option("-h","--hmm", default="false", help="Perform HMM estimation (default: false")
 	parser.add_option("-n", "--num_states", default="8", help="Set the number of states to estimate for HMM model")
-	parser.add_option("-f","--filename", default="brownian_data4.mat", help="Filename of dataset")
+	parser.add_option("-f","--chromosome", default="1", help="Chromosome name")
 	parser.add_option("-l","--length", default="one", help="Filename of length vectors")
-	parser.add_option("-p","--root_path", default="/home/yy3/data1/replication_timing/hmmseg/vbak2/em", help="Root directory of the data files")
+	parser.add_option("-p","--root_path", default=".", help="Root directory of the input data files")
 	parser.add_option("-m","--multiple", default="true", help="Use multivariate data (true, default) or single variate data (false) ")
 	parser.add_option("-a","--species_name", default="human", help="Species to estimate states (used under single variate mode)")
 	parser.add_option("-o","--sort_states", default="false", help="Whether to sort the states")
@@ -1987,7 +1986,7 @@ def parse_args():
 	(opts, args) = parser.parse_args()
 	return opts
 
-def run(hmm_estimate,num_states,filename,length_vec,root_path,multiple,species_name,
+def run(num_states,filename,length_vec,root_path,multiple,species_name,
 		sort_states,run_id1,cons_param,method_mode,
 		initial_mode,initial_weight,initial_weight1,initial_magnitude, 
 		position1, position2, filter_sigma, beta, beta1, num_neighbor, filter_mode, 
@@ -2017,7 +2016,8 @@ def run(hmm_estimate,num_states,filename,length_vec,root_path,multiple,species_n
 	print "estimate type %d"%(estimate_type)
 
 	# load the edge list
-	data_path = "."	# the directory where phylogeny information files are kept
+	# data_path = "."	# the directory where phylogeny information files are kept
+	data_path = str(root_path)
 	filename2 = "%s/edge.1.txt"%(data_path)
 	if(os.path.exists(filename2)==True):
 		f = open(filename2, 'r')
@@ -2257,7 +2257,7 @@ def run(hmm_estimate,num_states,filename,length_vec,root_path,multiple,species_n
 if __name__ == '__main__':
 
 	opts = parse_args()
-	run(opts.hmm,opts.num_states,opts.filename,opts.length,opts.root_path,opts.multiple,\
+	run(opts.num_states,opts.filename,opts.length,opts.root_path,opts.multiple,\
 		opts.species_name,opts.sort_states,opts.run_id,opts.cons_param, opts.method_mode, \
 		opts.initial_mode, opts.initial_weight, opts.initial_weight1, opts.initial_magnitude, \
 		opts.position1, opts.position2, opts.filter_sigma, opts.beta, opts.beta1, opts.num_neighbor, \
