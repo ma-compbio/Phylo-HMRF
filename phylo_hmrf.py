@@ -1599,9 +1599,6 @@ class phyloHMRF(_BaseGraph):
 		initial_guess = np.random.rand((1,self.n_params))
 		# initial_guess = self.params_vec1[state_id].copy()
 
-		method_vec = ['L-BFGS-B','BFGS','SLSQP','Nelder-Mead','Newton-CG']
-		id1 = 0
-
 		method_vec = ['L-BFGS-B','BFGS','SLSQP','COBYLA','Nelder-Mead','Newton-CG']
 		id1 = 0
 		# con1 = {'type': 'ineq', 'fun': constraint1}
@@ -1897,7 +1894,6 @@ class phyloHMRF(_BaseGraph):
 		return covar_mtx.copy(), mean_values1.copy()
 
 	def _load_simu_parameters(self, filename1):
-		# filename3 = "/home/yy3/data1/replication_timing/hmmseg/vbak2/em/init1_%d.mat"%(n_components1)
 		simu_params = scipy.io.loadmat(filename1)
 
 		# start_prob, transmat, branch_param = simu_params['startprob'], simu_params['transmat'], simu_params['branch_param']
@@ -1980,7 +1976,7 @@ def parse_args():
 	parser.add_option("--num_neighbor",default="8",help="number of neighbors")
 	parser.add_option("--filter_mode",default="0",help="filter method")
 	parser.add_option("-e","--threshold", default="0.001", help="convergence threshold")
-	parser.add_option("-g","--estimate_type",default="0",help="choice to consider edge weights: 0: not consider edge weights; 3: consider edge weights")
+	parser.add_option("-g","--estimate_type",default="3",help="choice to consider edge weights: 0: not consider edge weights; 3: consider edge weights")
 	parser.add_option("-q","--annotation",default="a1",help="annotation of the filename")
 
 	(opts, args) = parser.parse_args()
@@ -2085,7 +2081,6 @@ def run(num_states,filename,length_vec,root_path,multiple,species_name,
 
 	# filename1 = filename
 	filename1 = output_filename
-	# output_filename2 = "%s/chr%s.%dKb.edgeList.%s.txt"%(output_path,chrom,int(resolution/1000),annot1)
 	data_ori = pd.read_table(filename1)	# load DataFrame file
 	colnames = list(data_ori)
 
@@ -2142,8 +2137,8 @@ def run(num_states,filename,length_vec,root_path,multiple,species_name,
 		t_position = position[idx,:]
 
 		annot2 = 'chr%s.local.test5.graphcut.%s'%(chrom,annotation)
-		output_filename1 = "data1_mtx.test.%s.%d.%d.R5.1.txt"%(annot2,position1,position2)
-		output_filename2 = "%s/chr%s.%dKb.edgeList.select2.%s.neighbor%d.%s.%d.%d.R5.1.txt"%(output_path,chrom,int(resolution/1000),annot1,num_neighbor,annot2,position1,position2)
+		output_filename1 = "data1_mtx.test.%s.%d.%d.txt"%(annot2,position1,position2)
+		output_filename2 = "%s/chr%s.%dKb.edgeList.%s.%d.%d.txt"%(output_path,chrom,int(resolution/1000),annot2,position1,position2)
 		#output_filename1 = ""
 		#output_filename2 = ""
 		#x1, mtx1, t_position, edge_list_1 = utility1.write_matrix_image_Ctrl_v1(x1,t_position,
@@ -2167,9 +2162,7 @@ def run(num_states,filename,length_vec,root_path,multiple,species_name,
 			b2 = np.where(x1[:,k]>1e-05)[0]
 			print k, dim1, len(b2), np.mean(x1[:,k]), np.median(x1[:,k]), np.max(x1[:,k]), np.mean(x1[b2,k]), np.median(x1[b2,k])			
 
-		# samples.append(x1)
 		samples.extend(x1)
-		# sample_id.append(idx)
 		start_region = np.min(t_position)
 		n_samples = x1.shape[0]
 		id2 = id1 + n_samples
@@ -2182,7 +2175,6 @@ def run(num_states,filename,length_vec,root_path,multiple,species_name,
 		# edge_list_1 = utility1.edge_list_grid2(data_ori.loc[idx,colnames], output_filename2, species_num)
 		edge_list_1 = np.asarray(edge_list_1)
 		edge_list_1 = np.int64(edge_list_1)
-		# edge_list_1 = np.loadtxt(output_filename2, dtype='int', delimiter='\t')	# load *.txt file
 		edge_list_vec.append(edge_list_1)
 
 		dim = mtx1.shape
