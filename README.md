@@ -2,7 +2,7 @@
 
 Phylogenetic Hidden Markov Random Filed model
 
-The command to use Phylp-HMGP for evolutionary state estimation is as follows. 
+The command to use Phylp-HMRF for evolutionary state estimation is as follows. 
 
 python phylo_hmrf.py [Options]
 
