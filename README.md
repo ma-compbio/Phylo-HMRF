@@ -16,8 +16,6 @@ The options:
 
 - -r, --run_id : experiment id, default = 0
 
-- -t, --method_mode : method_mode: 0- Phylo-HMGP-BM; 1- Phylo-HMGP-OU, default = 1
-
 - -c, --cons_param : constraint parameter, default = 4
 
 - -i, --initial_weight : initial weight for initial parameters, default = 0.5
