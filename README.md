@@ -22,8 +22,6 @@ The options:
 
 - -j, --initial_magnitude : initial magnitude for initial parameters, default = 1
 
-- -s, --version : dataset version, default = 1
-
 Example: python phylo_hmrf.py -f 1 -n 20 (using Phylo-HMRF to estimate 20 states on syntenic regions on chromosome 1 on the provided example data)
 
 For the provided example, the input includes four files: edge.1.txt, branch_length.1.txt, species_name.1.txt, chromosomeID.synteny.txt, and path_list.txt. Please follow the descriptions of the example input files to prepare the input files for your own study. Please keep the input files in the directory specified by the argument '-p' (or '--root_path'). The directory of the input data files are set to be the current working directory by default. For the current version of Phylo-HMRF, please use the same file names as used in the example.
@@ -36,7 +34,7 @@ For the provided example, the input includes four files: edge.1.txt, branch_leng
 
 - chromosomeID.synteny.txt shows the syntenic regions on the chromosome where Phylo-HMRF is applied. Each row of the chromosomeID.synteny.txt shows the start coordinate, the stop coordinate, and the length of one syntenic region, respectively, delimited by a tab character.
 
-- path_list.txt shows the directory where the Hi-C contact frequency files of each species are kept. Each row of the path_list.txt shows the directory where the Hi-C contact frequency files of one species are kept. The order of the dictories for the species are the same with the order of the species names in the species_name.1.txt. The Hi-C contact files of one species include the Hi-C contact frequency file on each chromsome (or some chromsomes) of the corresponding species. Each row of the Hi-C contact frequency file includes the normalized Hi-C contact frequency between a pair of genome loci on the corresponding chromosome. The normalized Hi-C contact frequency file on a chromosome could be extracted from the raw genome-wide Hi-C contact frequency file of the species using tools such as Juicer Tools. 
+- path_list.txt shows the directory where the Hi-C contact frequency files of each species are kept. Each row of the path_list.txt shows the directory where the Hi-C contact frequency files of one species are kept. The dictories for the species are in the same order with the corresponding species names in the species_name.1.txt. The Hi-C contact files of one species include the Hi-C contact frequency file on each chromsome (or some chromsomes) of the corresponding species. Each row of the Hi-C contact frequency file includes the normalized Hi-C contact frequency between a pair of genome loci on the corresponding chromosome. The normalized Hi-C contact frequency file on a chromosome could be extracted from the raw genome-wide Hi-C contact frequency file of the species using tools such as Juicer Tools. Please name the Hi-C contact frequency file on each chromsome of a species as chromosomeID.(Resolution/1000)K.txt, e.g., chr1.50K.txt, where the chromosome is chr1 and the resolution (size of a unit genome region) is 50Kb.
 
 ************************************************************************************
 # Required pre-installed packages
