@@ -53,6 +53,6 @@ Phylo-HMRF requires the following packages to be installed:
 - SciPy (tested on version 0.18.0)
 - pandas (tested on version 0.18.1)
 
-You could install the Anaconda (avilable from https://www.continuum.io/downloads) for convenience, which provides a open souce collection of widely used data science packages including Python and numpy.
+You could install the Anaconda (avilable from https://www.continuum.io/downloads) for convenience, which provides a open souce collection of widely used data science packages including Python and NumPy.
 
 
