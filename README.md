@@ -14,6 +14,12 @@ The options:
 
 - -f, --chromosome : the name of the chromosome to estimate hidden states using Phylo-HMRF, default = 1
 
+- --num_neighbor : the number of neighbors of each node in the neighborhood system, default = 8
+
+- -b, --beta : the pairwise potentional parameter beta_0, default = 1
+
+- --beta1 : the pairwise potential parameter beta_1, default = 0.1
+
 - -r, --run_id : experiment id, default = 0
 
 - -c, --cons_param : constraint parameter, default = 4
