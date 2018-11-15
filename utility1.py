@@ -468,3 +468,89 @@ def write_matrix_array_v1(mtx1, start_region, output_filename1, type_id):
 		np.savetxt(output_filename1, data_1, delimiter='\t', fmt='%.2f')
 
 	return data_1, pos_idx_1, serial
+
+def multi_contact_matrix(chrom, resolution, filename_list, species, output_filename):
+
+	# species = ['gorGor4','panTro5','panPan2','hg38']	
+	species_num = len(species)
+	
+	value_dict = dict()
+	value_dict1 = dict()
+	serial1 = []
+	# serial2 = ref_serial.copy()
+	t_serial2 = []
+
+	cnt = 3
+	for input_path in filename_list:
+
+		filename1 = "%s/chr%s.%dK.txt"%(input_path,chrom,int(resolution/1000))
+		if os.path.exists(filename1)==False:
+			print "File %s does not exist. Please check."%(filename1)
+			return False
+
+		data2 = pd.read_table(filename1,header=None)
+		num1 = data2.shape[0]
+		x1, x2, value = np.asarray(data2[0]), np.asarray(data2[1]), np.asarray(data2[2])
+		x1, x2 = x1/resolution, x2/resolution
+
+		N1, N2 = x1[-1], x2[-1]
+		N = np.max((N1,N2))
+
+		t_vec_serial = np.int64((N+1)*x1 + x2)	# serial of the regions
+
+		b1 = np.where(np.isnan(value)==True)[0]
+		value[b1] = -1
+		
+		num2 = len(b1)
+		print num1, num2
+
+		value_dict[species_id] = t_vec_serial	# serial
+		# value_dict1[species_id] = value
+		value_dict1[species_id] = [x1,x2,value]	# value
+
+		serial1 = np.union1d(serial1,t_vec_serial)
+		# serial2 = np.intersect1d(serial2,t_vec_serial)
+		t_serial2.append(t_vec_serial)
+
+	serial2 = t_serial2[0]	
+	for i in range(1,species_num):
+		serial2 = np.intersect1d(serial2,t_serial2[i])
+
+	n1, n2 = len(serial1), len(serial2)
+	print "union, intersection", n1, n2
+
+	colnames = [0,1,2]
+	colnames.extend(species)
+	data_2 = output_multi_contactMtx(serial1, colnames, species, value_dict, value_dict1, resolution, output_filename)
+
+	return list(data_2)
+
+def output_multi_contactMtx(serial1, colnames, species, value_dict, value_dict1, resolution, output_filename1):
+
+	n1 = len(serial1)
+	print n1
+
+	data_1 = pd.DataFrame(columns=colnames)
+
+	species_num = len(species)
+	mtx1 = np.zeros((n1,species_num))
+	mtx_1 = np.zeros((n1,3))
+	
+	for i in range(0,species_num):
+		species_id = species[i]
+		temp1 = value_dict[species_id]	# serial
+		temp2 = value_dict1[species_id]	# value
+		x1, x2, value = temp2[0], temp2[1], temp2[2]
+		print len(temp1)
+		idx = mapping_Idx(serial1,temp1)
+		b1 = np.where(idx>=0)[0]
+		if len(b1)>0:
+			mtx1[idx[b1],i] = value[b1]
+			data_1[species_id] = mtx1[:,i]
+			mtx_1[idx[b1],0], mtx_1[idx[b1],1] = x1[b1], x2[b1]
+
+	data_1[0], data_1[1], data_1[2] = np.int64(mtx_1[:,0]), np.int64(mtx_1[:,1]), np.int64(serial1)		
+
+	data_1.to_csv(output_filename1,index=False,sep='\t')
+
+	return data_1

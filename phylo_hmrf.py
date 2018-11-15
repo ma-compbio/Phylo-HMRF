@@ -1968,21 +1968,20 @@ def parse_args():
 	parser.add_option("-o","--sort_states", default="false", help="Whether to sort the states")
 	parser.add_option("-r","--run_id", default="0", help="experiment id")
 	parser.add_option("-c","--cons_param", default="1", help="constraint parameter")
-	parser.add_option("-t","--method_mode", default="1", help="method_mode: 0: Gaussian-HMM; 1: Kmeans; 2: BM-HMM; 3: OU-HMM")
 	parser.add_option("-d","--initial_mode", default="0", help="initial mode: 0: positive random vector; 1: positive random vector for branches")
 	parser.add_option("-i","--initial_weight", default="0.2", help="initial weight 0 for initial parameters")
 	parser.add_option("-k","--initial_weight1", default="0", help="initial weight 1 for initial parameters")
 	parser.add_option("-j","--initial_magnitude", default="1", help="initial magnitude for initial parameters")
-	parser.add_option("-s","--simu_version", default="12", help="dataset version")
+	parser.add_option("-s","--simu_version", default="1", help="dataset version")
 	parser.add_option("-u","--position1", default="902205", help="position1")
 	parser.add_option("-v","--position2", default="36541194", help="position2")
 	parser.add_option("-w","--filter_sigma", default="0.25", help="sigma of filter")
 	parser.add_option("-b","--beta", default="1", help="beta")
-	parser.add_option("--beta1",default="0.5",help="beta1")
+	parser.add_option("--beta1",default="0.1",help="beta1")
 	parser.add_option("--num_neighbor",default="8",help="number of neighbors")
 	parser.add_option("--filter_mode",default="0",help="filter method")
 	parser.add_option("-e","--threshold", default="0.001", help="convergence threshold")
-	parser.add_option("-g","--estimate_type",default="0",help="the method used for estimating label: graph cuts:0; lbp:1")
+	parser.add_option("-g","--estimate_type",default="0",help="choice to consider edge weights: 0: not consider edge weights; 3: consider edge weights")
 	parser.add_option("-q","--annotation",default="a1",help="annotation of the filename")
 
 	(opts, args) = parser.parse_args()
@@ -2018,7 +2017,7 @@ def run(hmm_estimate,num_states,filename,length_vec,root_path,multiple,species_n
 	print "estimate type %d"%(estimate_type)
 
 	# load the edge list
-	data_path = "."
+	data_path = "."	# the directory where phylogeny information files are kept
 	filename2 = "%s/edge.1.txt"%(data_path)
 	if(os.path.exists(filename2)==True):
 		f = open(filename2, 'r')
@@ -2035,10 +2034,44 @@ def run(hmm_estimate,num_states,filename,length_vec,root_path,multiple,species_n
 		branch_list = branch_list[0]
 		print branch_list
 
+	# load species name
+	filename2 = "%s/species_name.1.txt"%(data_path)
+	if(os.path.exists(filename2)==True):
+		f = open(filename2, 'r')
+		print("species names loaded")
+		species = [line.split('\t') for line in f]
+		species = species[0]
+		print species
+
+	# chromosome name
 	chrom = str(filename)
 	# chrom = "1"
-	resolution = 50000
-	output_path = "."
+	resolution = 50000	# the bin size is set to be 50Kb as default
+
+	# load region_list
+	filename2 = "%s/chr%s.synteny.txt"%(data_path,chrom)
+	if(os.path.exists(filename2)==True):
+		t_lenvec = np.loadtxt(filename2, dtype='int', delimiter='\t')	# load *.txt file
+		region_list = []
+		temp1 = np.ravel(t_lenvec)
+		if len(temp1)==3:
+			region_list.append(t_lenvec[0:2])
+		else:
+			num1 = len(t_lenvec)
+			for i in range(0,3):
+				region_list.append(t_lenvec[i,0:2])
+
+		print region_list
+
+	# load region_list
+	filename2 = "%s/path_list.txt"%(data_path)
+	if(os.path.exists(filename2)==True):
+		f = open(filename2, 'r')
+		print("path list loaded")
+		filename_list = [line.split('\t') for line in f]
+		print filename_list
+
+	output_path = "."	# the directory where multi-species Hi-C contact file is output
 	annot1 = 'observed'
 	output_filename = "%s/chr%s.%dKb.%s.txt"%(output_path,chrom,int(resolution/1000),annot1)
 	print output_filename
@@ -2046,7 +2079,7 @@ def run(hmm_estimate,num_states,filename,length_vec,root_path,multiple,species_n
 	# write contact frequency of different species into an array (n_samples*(n_position+n_species))
 	ref_species = 'hg38'
 	type_id = 0
-	utility1.multi_contact_matrix3A(chrom, resolution, output_filename, type_id)
+	utility1.multi_contact_matrix(chrom, resolution, filename_list, species, output_filename)
 
 	species_num = 4
 
@@ -2073,7 +2106,7 @@ def run(hmm_estimate,num_states,filename,length_vec,root_path,multiple,species_n
 	sigma = float(filter_sigma)
 	type_id = 0
 
-	region_list = [[902205,36541194]]
+	# region_list = [[902205,36541194]]
 
 	edge_list_vec = []
 	
@@ -2088,42 +2121,73 @@ def run(hmm_estimate,num_states,filename,length_vec,root_path,multiple,species_n
 
 	print "select regions..."
 
-	position1, position2 = t_position[0], t_position[1] 
-	output_filename3 = "%s/chr%s.%dKb.select2.%s.%d.%d.R5.txt"%(output_path,chrom,int(resolution/1000),annot1,position1,position2)
-	#output_filename3 = ""
-	x1, idx = utility1.select_valuesPosition1(position, x, output_filename3, position1, position2, resolution)
+	for t_position in region_list:
 
-	t_position = position[idx,:]
+		print "select regions..."
 
-	annot2 = 'chr%s.%d.%d.%s'%(chrom,position1,position2,annotation)
-	output_filename1 = "data1_mtx.test.%s.%d.%d.txt"%(annot2,position1,position2)
-	output_filename2 = "%s/chr%s.%dKb.edgeList.%s.neighbor%d.%s.%d.%d.txt"%(output_path,chrom,int(resolution/1000),annot1,num_neighbor,annot2,position1,position2)
-	#output_filename1 = ""
-	#output_filename2 = ""
+		position1, position2 = t_position[0], t_position[1] 
+		output_filename3 = "%s/chr%s.%dKb.select2.%s.%d.%d.R5.txt"%(output_path,chrom,int(resolution/1000),annot1,position1,position2)
+		#output_filename3 = ""
+		x1, idx = utility1.select_valuesPosition1(position, x, output_filename3, position1, position2, resolution)
 
-	x1, mtx1, t_position, edge_list_1 = utility1.write_matrix_image_Ctrl_v2(x1,t_position,output_filename1,output_filename2,
+		print position1, position2, x1.shape
+		print np.mean(x1,axis=0)
+		print np.max(x1,axis=0)
+
+		dim1,dim2 = x1.shape[0], x1.shape[-1]
+		for k in range(0,dim2):
+			b2 = np.where(x1[:,k]>1e-05)[0]
+			print k, dim1, len(b2), np.mean(x1[:,k]), np.median(x1[:,k]), np.max(x1[:,k]), np.mean(x1[b2,k]), np.median(x1[b2,k])			
+
+		t_position = position[idx,:]
+
+		annot2 = 'chr%s.local.test5.graphcut.%s'%(chrom,annotation)
+		output_filename1 = "data1_mtx.test.%s.%d.%d.R5.1.txt"%(annot2,position1,position2)
+		output_filename2 = "%s/chr%s.%dKb.edgeList.select2.%s.neighbor%d.%s.%d.%d.R5.1.txt"%(output_path,chrom,int(resolution/1000),annot1,num_neighbor,annot2,position1,position2)
+		#output_filename1 = ""
+		#output_filename2 = ""
+		#x1, mtx1, t_position, edge_list_1 = utility1.write_matrix_image_Ctrl_v1(x1,t_position,
+		#						output_filename1,output_filename2,num_neighbor,sigma,type_id,filter_mode)
+
+		# if the file already exists, it will not be overwritten
+		if(os.path.exists(output_filename1)==True):
+			output_filename1 = ""
+		if(os.path.exists(output_filename2)==True):
+			output_filename2 = ""
+
+		x1, mtx1, t_position, edge_list_1 = utility1.write_matrix_image_Ctrl_v2(x1,t_position,output_filename1,output_filename2,
 										num_neighbor,sigma,type_id,filter_mode,filter_param1,filter_param2)
 
-	# samples.append(x1)
-	samples.extend(x1)
-	# sample_id.append(idx)
-	start_region = np.min(t_position)
-	n_samples = x1.shape[0]
-	id2 = id1 + n_samples
-	n_samples_accumulate = n_samples_accumulate+n_samples
+		print x1.shape,mtx1.shape,t_position,len(edge_list_1)
+		print np.mean(x1,axis=0)
+		print np.max(x1,axis=0)
 
-	len_vec.append([n_samples,id1,id2,mtx1.shape[0],mtx1.shape[1],start_region])
+		dim1,dim2 = x1.shape[0], x1.shape[-1]
+		for k in range(0,dim2):
+			b2 = np.where(x1[:,k]>1e-05)[0]
+			print k, dim1, len(b2), np.mean(x1[:,k]), np.median(x1[:,k]), np.max(x1[:,k]), np.mean(x1[b2,k]), np.median(x1[b2,k])			
 
-	id1 = id2
+		# samples.append(x1)
+		samples.extend(x1)
+		# sample_id.append(idx)
+		start_region = np.min(t_position)
+		n_samples = x1.shape[0]
+		id2 = id1 + n_samples
+		n_samples_accumulate = n_samples_accumulate+n_samples
 
-	edge_list_1 = np.asarray(edge_list_1)
-	edge_list_1 = np.int64(edge_list_1)
+		len_vec.append([n_samples,id1,id2,mtx1.shape[0],mtx1.shape[1],start_region])
 
-	edge_list_vec.append(edge_list_1)
+		id1 = id2
 
-	dim = mtx1.shape
-	print "mtx1:", dim
-	dim1, dim2 = dim[0], dim[1]
+		# edge_list_1 = utility1.edge_list_grid2(data_ori.loc[idx,colnames], output_filename2, species_num)
+		edge_list_1 = np.asarray(edge_list_1)
+		edge_list_1 = np.int64(edge_list_1)
+		# edge_list_1 = np.loadtxt(output_filename2, dtype='int', delimiter='\t')	# load *.txt file
+		edge_list_vec.append(edge_list_1)
+
+		dim = mtx1.shape
+		print "mtx1:", dim
+		dim1, dim2 = dim[0], dim[1]
 
 	samples = np.asarray(samples)
 	print samples.shape
