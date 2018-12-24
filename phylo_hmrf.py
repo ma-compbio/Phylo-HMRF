@@ -2101,8 +2101,6 @@ def run(num_states,filename,length_vec,root_path,multiple,species_name,
 	sigma = float(filter_sigma)
 	type_id = 0
 
-	# region_list = [[902205,36541194]]
-
 	edge_list_vec = []
 	
 	samples = []
@@ -2171,8 +2169,7 @@ def run(num_states,filename,length_vec,root_path,multiple,species_name,
 		len_vec.append([n_samples,id1,id2,mtx1.shape[0],mtx1.shape[1],start_region])
 
 		id1 = id2
-
-		# edge_list_1 = utility1.edge_list_grid2(data_ori.loc[idx,colnames], output_filename2, species_num)
+		
 		edge_list_1 = np.asarray(edge_list_1)
 		edge_list_1 = np.int64(edge_list_1)
 		edge_list_vec.append(edge_list_1)
@@ -2226,8 +2223,6 @@ def run(num_states,filename,length_vec,root_path,multiple,species_name,
 	print "predicting states..."
 		
 	annot2 = 'chr%s.graphcut.joint.%d.%d.%s'%(chrom,position1,position2,annotation)
-	# state_est = state_est.reshape((len(state_est),1))
-	# state_est = np.hstack((t_position,state_est))
 
 	path_1 = "./"
 
