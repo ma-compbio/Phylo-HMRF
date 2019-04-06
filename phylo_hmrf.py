@@ -31,7 +31,6 @@ import pickle
 
 import pygco
 
-from sklearn import preprocessing
 import sklearn.preprocessing
 import multiprocessing as mp
 
