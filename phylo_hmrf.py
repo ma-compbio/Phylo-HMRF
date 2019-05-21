@@ -1981,7 +1981,7 @@ def parse_args():
 	(opts, args) = parser.parse_args()
 	return opts
 
-def run(num_states,filename,length_vec,root_path,multiple,species_name,
+def run(num_states,chromosome,length_vec,root_path,multiple,species_name,
 		sort_states,run_id1,cons_param,method_mode,
 		initial_mode,initial_weight,initial_weight1,initial_magnitude, 
 		position1, position2, filter_sigma, beta, beta1, num_neighbor, filter_mode, 
@@ -2039,7 +2039,7 @@ def run(num_states,filename,length_vec,root_path,multiple,species_name,
 		print species
 
 	# chromosome name
-	chrom = str(filename)
+	chrom = str(chromosome)
 	# chrom = "1"
 	resolution = 50000	# the bin size is set to be 50Kb as default
 
@@ -2243,7 +2243,7 @@ def run(num_states,filename,length_vec,root_path,multiple,species_name,
 if __name__ == '__main__':
 
 	opts = parse_args()
-	run(opts.num_states,opts.filename,opts.length,opts.root_path,opts.multiple,\
+	run(opts.num_states,opts.chromosome,opts.length,opts.root_path,opts.multiple,\
 		opts.species_name,opts.sort_states,opts.run_id,opts.cons_param, opts.method_mode, \
 		opts.initial_mode, opts.initial_weight, opts.initial_weight1, opts.initial_magnitude, \
 		opts.position1, opts.position2, opts.filter_sigma, opts.beta, opts.beta1, opts.num_neighbor, \
