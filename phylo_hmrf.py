@@ -1952,7 +1952,7 @@ class phyloHMRF(_BaseGraph):
 				self.transmat_[id1] = t1.copy()
 
 def parse_args():
-	parser = OptionParser(usage="Replication timing state estimation", add_help_option=False)
+	parser = OptionParser(usage="Phylo-HMRF state estimation", add_help_option=False)
 	parser.add_option("-n", "--num_states", default="8", help="Set the number of states to estimate for HMM model")
 	parser.add_option("-f","--chromosome", default="1", help="Chromosome name")
 	parser.add_option("-l","--length", default="one", help="Filename of length vectors")
