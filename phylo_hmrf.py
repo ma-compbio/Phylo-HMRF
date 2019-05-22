@@ -2109,9 +2109,6 @@ def run(num_states,chromosome,length_vec,root_path,multiple,species_name,
 	filter_param1, filter_param2 = -1, -1
 	if filter_mode==0:
 		filter_param1, filter_param2 = 5, 50
-	for t_position in region_list:
-
-	print "select regions..."
 
 	for t_position in region_list:
 
