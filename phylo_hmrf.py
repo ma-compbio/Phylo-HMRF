@@ -1982,7 +1982,7 @@ def parse_args():
 	return opts
 
 def run(num_states,chromosome,length_vec,root_path,multiple,species_name,
-		sort_states,run_id1,cons_param,method_mode,
+		sort_states,run_id1,cons_param,
 		initial_mode,initial_weight,initial_weight1,initial_magnitude, 
 		position1, position2, filter_sigma, beta, beta1, num_neighbor, filter_mode, 
 		conv_threshold, estimate_type, simu_version, annotation):
@@ -1996,7 +1996,6 @@ def run(num_states,chromosome,length_vec,root_path,multiple,species_name,
 	initial_weight = float(initial_weight)
 	initial_weight1 = float(initial_weight1)
 	initial_magnitude = float(initial_magnitude)
-	method_mode = int(method_mode)
 	version = int(simu_version)
 	region_start = int(position1)
 	region_stop = int(position2)
@@ -2034,9 +2033,8 @@ def run(num_states,chromosome,length_vec,root_path,multiple,species_name,
 	if(os.path.exists(filename2)==True):
 		f = open(filename2, 'r')
 		print("species names loaded")
-		species = [line.split('\t') for line in f]
-		species = species[0]
-		print species
+		species = [line.strip() for line in f]
+		print species[0]
 
 	# chromosome name
 	chrom = str(chromosome)
@@ -2063,7 +2061,7 @@ def run(num_states,chromosome,length_vec,root_path,multiple,species_name,
 	if(os.path.exists(filename2)==True):
 		f = open(filename2, 'r')
 		print("path list loaded")
-		filename_list = [line.split('\t') for line in f]
+		filename_list = [line.strip() for line in f]
 		print filename_list
 
 	output_path = "."	# the directory where multi-species Hi-C contact file is output
@@ -2202,7 +2200,7 @@ def run(num_states,chromosome,length_vec,root_path,multiple,species_name,
 
 	sym_Idx = utility1.symmetric_idx(dim1,dim2) 
 
-	tree1 = phyloHMM1(n_components=n_components1, run_id=run_id, n_samples = n_samples_accumulate, n_features = samples[0].shape[-1], 
+	tree1 = phyloHMRF(n_components=n_components1, run_id=run_id, n_samples = n_samples_accumulate, n_features = samples[0].shape[-1], 
 				n_dim1 = dim[0], n_dim2 = dim[1], 
 				observation=samples, observation_mtx=mtx1, edge_list=edge_list, len_vec = len_vec, type_id=version, branch_list=branch_list, edge_list_1 = edge_list_vec, 
 				cons_param=cons_param, beta = beta, beta1 = beta1, initial_mode = initial_mode, 
@@ -2241,7 +2239,7 @@ if __name__ == '__main__':
 
 	opts = parse_args()
 	run(opts.num_states,opts.chromosome,opts.length,opts.root_path,opts.multiple,\
-		opts.species_name,opts.sort_states,opts.run_id,opts.cons_param, opts.method_mode, \
+		opts.species_name,opts.sort_states,opts.run_id,opts.cons_param, \
 		opts.initial_mode, opts.initial_weight, opts.initial_weight1, opts.initial_magnitude, \
 		opts.position1, opts.position2, opts.filter_sigma, opts.beta, opts.beta1, opts.num_neighbor, \
 		opts.filter_mode, opts.threshold, opts.estimate_type, \
