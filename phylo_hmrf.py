@@ -56,7 +56,7 @@ class phyloHMRF(_BaseGraph):
 	def __init__(self, n_samples, n_features, n_dim1, n_dim2, edge_list, branch_list, cons_param, beta, beta1, 
 				 initial_mode, initial_weight, initial_weight1, initial_magnitude, observation,
 				 observation_mtx, edge_list_1, len_vec, type_id = 0, 
-				 max_iter = 10,
+				 max_iter = 100,
 				 n_components=1, run_id=0, estimate_type=0, covariance_type='full',
 				 min_covar=1e-3,
 				 startprob_prior=1.0, transmat_prior=1.0, 
@@ -69,7 +69,7 @@ class phyloHMRF(_BaseGraph):
 		_BaseGraph.__init__(self, n_components=n_components, run_id=run_id, estimate_type=estimate_type, 
 						  startprob_prior=startprob_prior,
 						  transmat_prior=transmat_prior, algorithm=algorithm,
-						  random_state=random_state, n_iter=n_iter,
+						  random_state=random_state, max_iter=max_iter, n_iter=n_iter,
 						  tol=tol, params=params, verbose=verbose,
 						  init_params=init_params)
 
@@ -1337,19 +1337,21 @@ class phyloHMRF(_BaseGraph):
 		c = state_id
 		# print "state_id: %d"%(state_id), params
 		flag = self._check_params(params)
-		if flag <= -2:
+		if flag <= -1:
 			# print "state_id: %d"%(state_id), params
 			# raise Exception("nan in params")
 			params = self.init_ou_params[state_id].copy()
 			flag = self._check_params(params)
 			lik = None
-			if flag>-2:
+			if flag>-1:
 				lik = self._ou_lik_varied_constraint(params, state_id)
 				# print "nan in params restart: use initial parameter estimates %s"%(lik)
 				# print "nan1"
 
+			print("ou_lik_varied_constraint, lik ",lik)
 			return lik
 
+		print("ou_lik_varied_constraint %d %d"%(state_id,flag))
 		values = np.zeros((n2,2))	# expectation and variance
 		covar_mtx = np.zeros((n1,n1))
 
@@ -1426,6 +1428,7 @@ class phyloHMRF(_BaseGraph):
 						+np.sum(inv(V)*Sn_w)/n_samples
 						+lambda_0*lambda_1*np.dot(params.T,params))
 				# self.lik = lik
+				print(lik)
 			else:
 				print "ou_lik_varied_constraint %d %d"%(flag1,cnt1)
 				if cnt<10:
@@ -1462,7 +1465,7 @@ class phyloHMRF(_BaseGraph):
 		self.values = values.copy()
 		self.cv_mtx = V.copy()
 
-		# print "likelihood", state_id, lik
+		print "likelihood", state_id, lik
 
 		return lik
 
@@ -1599,13 +1602,13 @@ class phyloHMRF(_BaseGraph):
 					print "NAN error! %d"%(cnt)
 			flag, params1 = self._ou_optimize2_unit(state_id)
 			flag1 = self._check_params(params1)
-			# print("ou_optimize2_unit %d %d"%(flag,flag1))
+			print("ou_optimize2_unit %d %d"%(flag,flag1))
 			cnt = cnt + 1 
 			if cnt>10:
 				break
 		
 		if flag>0 and flag1>0:
-			# print "likelihood calculating..."
+			print "likelihood calculating..."
 			lik = self._ou_lik_varied_constraint(params1, state_id)
 		else:
 			print "out of bound error! use initial paramter estimates"
@@ -1645,15 +1648,16 @@ class phyloHMRF(_BaseGraph):
 							+ a2*self.params_vec1[state_id].copy()
 							+ (1-a1-a2)*random1)
 				# print "initial guess", initial_guess
-				# print("ou_optimize2_unit minimize 1")
+				print("ou_optimize2_unit minimize 1")
 				res = minimize(self._ou_lik_varied_constraint, initial_guess, args = (state_id),
 							method = method_vec[method_id], constraints=con1, tol=1e-5, options={'maxiter': 200, 'disp': False})
-				# print("ou_optimize2_unit minimize 2")
+				print("ou_optimize2_unit minimize 2")
 				
 			except Exception as err:
-				print("OS error: {0}".format(err))
+				# print("OS error: {0}".format(err))
 				flag1 = False
 				# print("ou_optimize2_unit %d"%(flag1))
+				print("OS error: {0} ou_optimize2_unit {1}".format(err,flag1))
 				cnt = cnt + 1 
 				print cnt
 				if cnt > 5:
@@ -1790,10 +1794,10 @@ class phyloHMRF(_BaseGraph):
 		#self._output_stats(self.counter)
 		#self.counter += 1
 
-		# print denom
+		print denom
 
 		if 'c' in self.params:
-			# print "flag: true covariance"
+			print "flag: true covariance"
 
 			for c in range(self.n_components):
 				print "state_id: %d"%(c)
@@ -1841,6 +1845,7 @@ def parse_args():
 	parser.add_option("--beta1",default="0.1",help="beta1")
 	parser.add_option("--num_neighbor",default="8",help="number of neighbors")
 	parser.add_option("--filter_mode",default="0",help="filter method")
+	parser.add_option("--max_iter",default="100",help="max number of iterations")
 	parser.add_option("-e","--threshold", default="0.001", help="convergence threshold")
 	parser.add_option("-g","--estimate_type",default="3",help="choice to consider edge weights: 0: not consider edge weights; 3: consider edge weights")
 	parser.add_option("-q","--annotation",default="a1",help="annotation of the filename")
@@ -1851,7 +1856,7 @@ def parse_args():
 def run(num_states,chromosome,length_vec,root_path,multiple,species_name,
 		sort_states,run_id1,cons_param,
 		initial_mode,initial_weight,initial_weight1,initial_magnitude, 
-		position1, position2, filter_sigma, beta, beta1, num_neighbor, filter_mode, 
+		position1, position2, filter_sigma, beta, beta1, num_neighbor, filter_mode, max_iter,
 		conv_threshold, estimate_type, simu_version, annotation):
 	
 	learning_rate=0.001
@@ -1873,6 +1878,7 @@ def run(num_states,chromosome,length_vec,root_path,multiple,species_name,
 	estimate_type = int(estimate_type)
 	annotation = str(annotation)
 	filter_mode = int(filter_mode)
+	max_iter = int(max_iter)
 
 	print "estimate type %d"%(estimate_type)
 
@@ -2072,7 +2078,7 @@ def run(num_states,chromosome,length_vec,root_path,multiple,species_name,
 				observation=samples, observation_mtx=mtx1, edge_list=edge_list, len_vec = len_vec, type_id=version, branch_list=branch_list, edge_list_1 = edge_list_vec, 
 				cons_param=cons_param, beta = beta, beta1 = beta1, initial_mode = initial_mode, 
 				initial_weight = initial_weight, initial_weight1 = initial_weight1, initial_magnitude = initial_magnitude, 
-				learning_rate=learning_rate, estimate_type = estimate_type, max_iter = 100, n_iter=5000, tol=1e-7)
+				learning_rate=learning_rate, estimate_type = estimate_type, max_iter = max_iter, n_iter=1000, tol=1e-7)
 
 	threshold = conv_threshold
 	print threshold
@@ -2109,5 +2115,5 @@ if __name__ == '__main__':
 		opts.species_name,opts.sort_states,opts.run_id,opts.cons_param, \
 		opts.initial_mode, opts.initial_weight, opts.initial_weight1, opts.initial_magnitude, \
 		opts.position1, opts.position2, opts.filter_sigma, opts.beta, opts.beta1, opts.num_neighbor, \
-		opts.filter_mode, opts.threshold, opts.estimate_type, \
+		opts.filter_mode, opts.max_iter, opts.threshold, opts.estimate_type, \
 		opts.simu_version, opts.annotation)

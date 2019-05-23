@@ -13,7 +13,7 @@ from sklearn.utils.validation import check_is_fitted
 
 import matplotlib.pyplot as plt
 
-from utility1 import normalize, iter_from_X_lengths
+from utility1_1 import normalize, iter_from_X_lengths
 
 # import maxflow
 # from maxflow.fastmin import aexpansion_grid, abswap_grid
@@ -104,8 +104,8 @@ class _BaseGraph(BaseEstimator):
 	"""
 	def __init__(self, n_components=1, run_id=0, estimate_type=0, weight_type=0,
 				 startprob_prior=1.0, transmat_prior=1.0,
-				 algorithm="viterbi", random_state=None,
-				 n_iter=10, tol=1e-2, verbose=False,
+				 algorithm="viterbi", random_state=None, max_iter = 100,
+				 n_iter=120, tol=1e-2, verbose=False,
 				 params=string.ascii_letters,
 				 init_params=string.ascii_letters):
 		self.n_components = n_components
@@ -115,6 +115,7 @@ class _BaseGraph(BaseEstimator):
 		self.transmat_prior = transmat_prior
 		self.algorithm = algorithm
 		self.random_state = random_state
+		self.max_iter = max_iter
 		self.n_iter = n_iter
 		self.tol = tol
 		self.verbose = verbose
@@ -198,7 +199,7 @@ class _BaseGraph(BaseEstimator):
 		print("model fitting...")
 		self.monitor_ = ConvergenceMonitor(self.tol, self.n_iter, self.verbose)
 		# self.n_iter = 100
-		max_iter = 100
+		max_iter = int(self.max_iter)
 		max_iter1 = 20		# iterations after the previous minimum
 		type_id = 0
 		pairwise_cost_pre, unary_cost_pre, cost1_pre = 0.001, 0.001, 0.001
@@ -278,8 +279,8 @@ class _BaseGraph(BaseEstimator):
 		print("model fitting...")
 		self.monitor_ = ConvergenceMonitor(self.tol, self.n_iter, self.verbose)
 		# self.n_iter = 100
-		max_iter = 50
-		max_iter1 = 30	# iterations after the previous minimum
+		max_iter = int(self.max_iter)
+		max_iter1 = 20	# iterations after the previous minimum
 		type_id = 0
 		pairwise_cost_pre, unary_cost_pre, cost1_pre = 0.001, 0.001, 0.001
 		threshold1, threshold2 = threshold, threshold
