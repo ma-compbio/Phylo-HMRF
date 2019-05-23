@@ -1326,7 +1326,7 @@ class phyloHMRF(_BaseGraph):
 			
 			return lik
 
-		print("ou_lik_varied_constraint %d %d"%(state_id,flag))
+		# print("ou_lik_varied_constraint %d %d"%(state_id,flag))
 		values = np.zeros((n2,2))	# expectation and variance
 		covar_mtx = np.zeros((n1,n1))
 
@@ -1405,7 +1405,7 @@ class phyloHMRF(_BaseGraph):
 				# self.lik = lik
 				print(lik)
 			else:
-				print "ou_lik_varied_constraint %d %d"%(flag1,cnt1)
+				# print "ou_lik_varied_constraint %d %d"%(flag1,cnt1)
 				if cnt<10:
 					V = V+self.min_covar*np.eye(self.n_features)	# handle it
 					cnt = cnt+1
@@ -1440,7 +1440,7 @@ class phyloHMRF(_BaseGraph):
 		self.values = values.copy()
 		self.cv_mtx = V.copy()
 
-		print "likelihood", state_id, lik
+		# print "likelihood", state_id, lik
 
 		return lik
 
@@ -1623,10 +1623,10 @@ class phyloHMRF(_BaseGraph):
 							+ a2*self.params_vec1[state_id].copy()
 							+ (1-a1-a2)*random1)
 				# print "initial guess", initial_guess
-				print("ou_optimize2_unit minimize 1")
+				# print("ou_optimize2_unit minimize 1")
 				res = minimize(self._ou_lik_varied_constraint, initial_guess, args = (state_id),
 							method = method_vec[method_id], constraints=con1, tol=1e-5, options={'maxiter': 200, 'disp': False})
-				print("ou_optimize2_unit minimize 2")
+				# print("ou_optimize2_unit minimize 2")
 				
 			except Exception as err:
 				# print("OS error: {0}".format(err))
