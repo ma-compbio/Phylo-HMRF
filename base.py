@@ -13,7 +13,7 @@ from sklearn.utils.validation import check_is_fitted
 
 import matplotlib.pyplot as plt
 
-from utility1_1 import normalize, iter_from_X_lengths
+from utility1 import normalize, iter_from_X_lengths
 
 # import maxflow
 # from maxflow.fastmin import aexpansion_grid, abswap_grid
