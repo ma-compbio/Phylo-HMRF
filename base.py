@@ -13,6 +13,8 @@ from sklearn.utils.validation import check_is_fitted
 
 import matplotlib.pyplot as plt
 
+from utility1_1 import normalize, iter_from_X_lengths
+
 # import maxflow
 # from maxflow.fastmin import aexpansion_grid, abswap_grid
 
@@ -276,8 +278,8 @@ class _BaseGraph(BaseEstimator):
 		print("model fitting...")
 		self.monitor_ = ConvergenceMonitor(self.tol, self.n_iter, self.verbose)
 		# self.n_iter = 100
-		max_iter = 100
-		max_iter1 = 50	# iterations after the previous minimum
+		max_iter = 50
+		max_iter1 = 30	# iterations after the previous minimum
 		type_id = 0
 		pairwise_cost_pre, unary_cost_pre, cost1_pre = 0.001, 0.001, 0.001
 		threshold1, threshold2 = threshold, threshold
@@ -414,14 +416,14 @@ class _BaseGraph(BaseEstimator):
 
 		"""
 
-	def _compute_posteriors(self, fwdlattice, bwdlattice):
-		# gamma is guaranteed to be correctly normalized by logprob at
-		# all frames, unless we do approximate inference using pruning.
-		# So, we will normalize each frame explicitly in case we
-		# pruned too aggressively.
-		log_gamma = fwdlattice + bwdlattice
-		log_normalize(log_gamma, axis=1)
-		return np.exp(log_gamma)
+	# def _compute_posteriors(self, fwdlattice, bwdlattice):
+	# 	# gamma is guaranteed to be correctly normalized by logprob at
+	# 	# all frames, unless we do approximate inference using pruning.
+	# 	# So, we will normalize each frame explicitly in case we
+	# 	# pruned too aggressively.
+	# 	log_gamma = fwdlattice + bwdlattice
+	# 	log_normalize(log_gamma, axis=1)
+	# 	return np.exp(log_gamma)
 
 	def _compute_posteriors_graph(self, X, label, start_idx, stop_idx):
 		"""Computes per-component posteriors under the model.
@@ -564,17 +566,17 @@ class _BaseGraph(BaseEstimator):
 		"""
 		# The ``np.where`` calls guard against updating forbidden states
 		# or transitions in e.g. a left-right HMM.
-		if 's' in self.params:
-			startprob_ = self.startprob_prior - 1.0 + stats['start']
-			self.startprob_ = np.where(self.startprob_ == 0.0,
-									   self.startprob_, startprob_)
-			normalize(self.startprob_)
-			#print self.startprob_
-		if 't' in self.params:
-			transmat_ = self.transmat_prior - 1.0 + stats['trans']
-			self.transmat_ = np.where(self.transmat_ == 0.0,
-									  self.transmat_, transmat_)
-			normalize(self.transmat_, axis=1)
-			print("updating transmat")
-			print(self.transmat_)
+		# if 's' in self.params:
+		# 	startprob_ = self.startprob_prior - 1.0 + stats['start']
+		# 	self.startprob_ = np.where(self.startprob_ == 0.0,
+		# 							   self.startprob_, startprob_)
+		# 	normalize(self.startprob_)
+		# 	#print self.startprob_
+		# if 't' in self.params:
+		# 	transmat_ = self.transmat_prior - 1.0 + stats['trans']
+		# 	self.transmat_ = np.where(self.transmat_ == 0.0,
+		# 							  self.transmat_, transmat_)
+		# 	normalize(self.transmat_, axis=1)
+		# 	print("updating transmat")
+		# 	print(self.transmat_)
 

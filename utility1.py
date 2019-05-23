@@ -20,6 +20,8 @@ from sklearn import datasets
 from scipy.stats import chisquare
 from scipy.stats import binom
 from scipy.stats import binom_test
+import numpy as np
+from scipy.misc import logsumexp
 
 from sklearn.metrics.cluster import normalized_mutual_info_score, adjusted_mutual_info_score, adjusted_rand_score
 from scipy.special import comb
@@ -297,8 +299,8 @@ def write_matrix_image_Ctrl_v2(value, pos, output_filename1, output_filename2, n
 		temp1 = mtx1[:,:,k]
 		x1 = np.ravel(temp1)
 		b2 = np.where(x1>1e-05)[0]
-		print "after write_matrix_image_v1"
-		print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
+		# print "after write_matrix_image_v1"
+		# print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
 
 	m1 = mtx1.reshape((mtx1.shape[0]*mtx1.shape[1],dim1))
 	print "m1 ori",np.mean(m1,axis=0)
@@ -307,8 +309,8 @@ def write_matrix_image_Ctrl_v2(value, pos, output_filename1, output_filename2, n
 		temp1 = m1[:,k]
 		x1 = np.ravel(temp1)
 		b2 = np.where(x1>1e-05)[0]
-		print "after reshape"
-		print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
+		# print "after reshape"
+		# print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
 
 	dim1 = mtx1.shape[-1]
 	# sigma = 0.5
@@ -472,7 +474,9 @@ def write_matrix_array_v1(mtx1, start_region, output_filename1, type_id):
 def multi_contact_matrix(chrom, resolution, filename_list, species, output_filename):
 
 	# species = ['gorGor4','panTro5','panPan2','hg38']	
+	print(species)
 	species_num = len(species)
+	print("species num: ",species_num)
 	
 	value_dict = dict()
 	value_dict1 = dict()
@@ -480,7 +484,7 @@ def multi_contact_matrix(chrom, resolution, filename_list, species, output_filen
 	# serial2 = ref_serial.copy()
 	t_serial2 = []
 
-	cnt = 3
+	cnt = 0
 	for input_path in filename_list:
 
 		filename1 = "%s/chr%s.%dK.txt"%(input_path,chrom,int(resolution/1000))
@@ -504,6 +508,8 @@ def multi_contact_matrix(chrom, resolution, filename_list, species, output_filen
 		num2 = len(b1)
 		print num1, num2
 
+		species_id = species[cnt]
+		cnt = cnt + 1
 		value_dict[species_id] = t_vec_serial	# serial
 		# value_dict1[species_id] = value
 		value_dict1[species_id] = [x1,x2,value]	# value
@@ -513,7 +519,9 @@ def multi_contact_matrix(chrom, resolution, filename_list, species, output_filen
 		t_serial2.append(t_vec_serial)
 
 	serial2 = t_serial2[0]	
+	print(len(t_serial2))
 	for i in range(1,species_num):
+		print(i)
 		serial2 = np.intersect1d(serial2,t_serial2[i])
 
 	n1, n2 = len(serial1), len(serial2)
@@ -554,3 +562,64 @@ def output_multi_contactMtx(serial1, colnames, species, value_dict, value_dict1,
 	data_1.to_csv(output_filename1,index=False,sep='\t')
 
 	return data_1
+
+# sourced from hmmlearn
+def normalize(a, axis=None):
+    """Normalizes the input array so that it sums to 1.
+
+    Parameters
+    ----------
+    a : array
+        Non-normalized input data.
+
+    axis : int
+        Dimension along which normalization is performed.
+
+    Notes
+    -----
+    Modifies the input **inplace**.
+    """
+    a_sum = a.sum(axis)
+    if axis and a.ndim > 1:
+        # Make sure we don't divide by zero.
+        a_sum[a_sum == 0] = 1
+        shape = list(a.shape)
+        shape[axis] = 1
+        a_sum.shape = shape
+
+    a /= a_sum
+
+# sourced from hmmlearn
+def log_normalize(a, axis=None):
+    """Normalizes the input array so that the exponent of the sum is 1.
+
+    Parameters
+    ----------
+    a : array
+        Non-normalized input data.
+
+    axis : int
+        Dimension along which normalization is performed.
+
+    Notes
+    -----
+    Modifies the input **inplace**.
+    """
+    a_lse = logsumexp(a, axis)
+    a -= a_lse[:, np.newaxis]
+
+# sourced from hmmlearn
+def iter_from_X_lengths(X, lengths):
+    if lengths is None:
+        yield 0, len(X)
+    else:
+        n_samples = X.shape[0]
+        end = np.cumsum(lengths).astype(np.int32)
+        start = end - lengths
+        if end[-1] > n_samples:
+            raise ValueError("more than {0:d} samples in lengths array {1!s}"
+                             .format(n_samples, lengths))
+
+        for i in range(len(lengths)):
+            yield start[i], end[i]
+
