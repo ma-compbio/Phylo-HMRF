@@ -2064,7 +2064,7 @@ def run(num_states,chromosome,length_vec,root_path,multiple,species_name,
 
 	print "predicting states..."
 		
-	annot2 = 'chr%s.graphcut.joint.%d.%d.%s'%(chrom,position1,position2,annotation)
+	annot2 = 'chr%s.graphcut.joint.%s'%(chrom,annotation)
 
 	path_1 = "./"
 
