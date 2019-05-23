@@ -34,6 +34,8 @@ import pygco
 import sklearn.preprocessing
 import multiprocessing as mp
 
+import utility1
+
 from optparse import OptionParser
 
 import os.path
@@ -245,8 +247,8 @@ class phyloHMRF(_BaseGraph):
 
 			# accelarated mini-batch k-means clustering
 			kmeans = cluster.MiniBatchKMeans(n_clusters=self.n_components,
-											random_state=self.random_state, batch_size=5000, 
-											max_iter=500, n_init=10)
+											random_state=self.random_state, batch_size=100000, 
+											max_iter=1000, n_init=10)
 
 			kmeans.fit(X)
 			self.means_ = kmeans.cluster_centers_
@@ -1340,7 +1342,7 @@ class phyloHMRF(_BaseGraph):
 			# raise Exception("nan in params")
 			params = self.init_ou_params[state_id].copy()
 			flag = self._check_params(params)
-			lik = np.nan
+			lik = None
 			if flag>-2:
 				lik = self._ou_lik_varied_constraint(params, state_id)
 				# print "nan in params restart: use initial parameter estimates %s"%(lik)
@@ -1412,7 +1414,9 @@ class phyloHMRF(_BaseGraph):
 		flag1 = False
 		cnt = 0
 		cnt1 = 0
-		lik = np.nan
+		# lik = np.nan
+		# lik = self.lik
+		lik = None
 		# print("state_id %d"%(state_id))
 		while flag1==False:
 			cnt1 = cnt1 + 1
@@ -1421,8 +1425,9 @@ class phyloHMRF(_BaseGraph):
 				lik = (self.stats['post'][c]*np.log(det(V)+small_eps)/n_samples
 						+np.sum(inv(V)*Sn_w)/n_samples
 						+lambda_0*lambda_1*np.dot(params.T,params))
+				# self.lik = lik
 			else:
-				# print "ou_lik_varied_constraint %d %d"%(flag1,cnt1)
+				print "ou_lik_varied_constraint %d %d"%(flag1,cnt1)
 				if cnt<10:
 					V = V+self.min_covar*np.eye(self.n_features)	# handle it
 					cnt = cnt+1
@@ -1430,28 +1435,27 @@ class phyloHMRF(_BaseGraph):
 				else:
 					print "matrix not invertible! %d"%(cnt)
 					#print V
-					print det(V)
-					flag1 = -1
-					break
+					# print det(V)
+					# flag1 = -1
+					# break
 					# print params
 					# print "state_id: %d"%(state_id), params
-					# try:
-					# 	# V = V+self.min_covar*np.eye(self.n_features)	# handle it
-					# 	pinv_V = np.linalg.pinv(V)		# handle it
-					# 	eps=1e-12
-					# 	lik = (self.stats['post'][c]*np.log(det(V)+small_eps)/n_samples
-					# 			+np.sum(pinv_V*Sn_w)/n_samples
-					# 			+lambda_0*lambda_1*np.dot(params.T,params))
-					# 	# lik = (-self.stats['post'][c]*np.log(det(pinv_V)+eps)/n_samples
-					# 	# 		+np.sum(pinv_V*Sn_w)/n_samples
-					# 	# 		+lambda_0*lambda_1*np.dot(params.T,params))
-					# 	flag1 = True
-					# except Exception as err:
-					# 	#raise
-					# 	print("OS error: {0}".format(err))
-					# 	flag1 = -1
-					# 	print(flag1)
-					# 	break
+					try:
+						# V = V+self.min_covar*np.eye(self.n_features)	# handle it
+						pinv_V = np.linalg.pinv(V)		# handle it
+						lik = (self.stats['post'][c]*np.log(det(V)+small_eps)/n_samples
+								+np.sum(pinv_V*Sn_w)/n_samples
+								+lambda_0*lambda_1*np.dot(params.T,params))
+						# lik = (-self.stats['post'][c]*np.log(det(pinv_V)+eps)/n_samples
+						# 		+np.sum(pinv_V*Sn_w)/n_samples
+						# 		+lambda_0*lambda_1*np.dot(params.T,params))
+						flag1 = True
+					except Exception as err:
+						#raise
+						print("OS error: {0}".format(err))
+						flag1 = -1
+						print(flag1)
+						break
 
 		if flag1<=0:
 			print "return from loop"
@@ -1543,8 +1547,8 @@ class phyloHMRF(_BaseGraph):
 					continue
 				else:
 					print "matrix not invertible! %d"%(cnt)
-					#print V
-					print det(V)
+					# print V
+					# print det(V)
 					# print params
 					# print "state_id: %d"%(state_id), params
 					try:
@@ -1595,11 +1599,13 @@ class phyloHMRF(_BaseGraph):
 					print "NAN error! %d"%(cnt)
 			flag, params1 = self._ou_optimize2_unit(state_id)
 			flag1 = self._check_params(params1)
+			# print("ou_optimize2_unit %d %d"%(flag,flag1))
 			cnt = cnt + 1 
 			if cnt>10:
 				break
 		
 		if flag>0 and flag1>0:
+			# print "likelihood calculating..."
 			lik = self._ou_lik_varied_constraint(params1, state_id)
 		else:
 			print "out of bound error! use initial paramter estimates"
@@ -1611,12 +1617,14 @@ class phyloHMRF(_BaseGraph):
 	def _ou_optimize2_unit(self, state_id):
 		
 		# initial_guess = 1*np.random.rand(self.n_params)
+		print "ou_optimize2_unit"
 		a1 = self.initial_w1
 		a2 = self.initial_w1a
 		w2 = self.initial_w2
 		n1 = self.node_num
 
 		method_vec = ['L-BFGS-B','BFGS','SLSQP','Nelder-Mead','Newton-CG']
+		method_id = 2
 		id1 = 0
 		cnt = 0
 		flag1 = False
@@ -1637,13 +1645,15 @@ class phyloHMRF(_BaseGraph):
 							+ a2*self.params_vec1[state_id].copy()
 							+ (1-a1-a2)*random1)
 				# print "initial guess", initial_guess
-				
+				# print("ou_optimize2_unit minimize 1")
 				res = minimize(self._ou_lik_varied_constraint, initial_guess, args = (state_id),
-							constraints=con1, tol=1e-5, options={'disp': False})
+							method = method_vec[method_id], constraints=con1, tol=1e-5, options={'maxiter': 200, 'disp': False})
+				# print("ou_optimize2_unit minimize 2")
 				
 			except Exception as err:
 				print("OS error: {0}".format(err))
 				flag1 = False
+				# print("ou_optimize2_unit %d"%(flag1))
 				cnt = cnt + 1 
 				print cnt
 				if cnt > 5:
@@ -1658,7 +1668,6 @@ class phyloHMRF(_BaseGraph):
 			return flag, params1
 
 		else:
-
 			return False, initial_guess
 
 	def _check_params(self, params):
@@ -1781,10 +1790,10 @@ class phyloHMRF(_BaseGraph):
 		#self._output_stats(self.counter)
 		#self.counter += 1
 
-		print denom
+		# print denom
 
 		if 'c' in self.params:
-			print "flag: true covariance"
+			# print "flag: true covariance"
 
 			for c in range(self.n_components):
 				print "state_id: %d"%(c)
@@ -1801,9 +1810,9 @@ class phyloHMRF(_BaseGraph):
 
 		print self.params_vec1
 		print self.means_
-		print self._covars_
-		for c in range(self.n_components):
-			print("%.4f\t")%(det(self._covars_[c]))
+		# print self._covars_
+		# for c in range(self.n_components):
+		# 	print("%.4f\t")%(det(self._covars_[c]))
 		print("\n")
 
 		# print self.startprob_
@@ -1821,8 +1830,8 @@ def parse_args():
 	parser.add_option("-r","--run_id", default="0", help="experiment id")
 	parser.add_option("-c","--cons_param", default="1", help="constraint parameter")
 	parser.add_option("-d","--initial_mode", default="0", help="initial mode: 0: positive random vector; 1: positive random vector for branches")
-	parser.add_option("-i","--initial_weight", default="0.2", help="initial weight 0 for initial parameters")
-	parser.add_option("-k","--initial_weight1", default="0", help="initial weight 1 for initial parameters")
+	parser.add_option("-i","--initial_weight", default="0.3", help="initial weight 0 for initial parameters")
+	parser.add_option("-k","--initial_weight1", default="0.1", help="initial weight 1 for initial parameters")
 	parser.add_option("-j","--initial_magnitude", default="1", help="initial magnitude for initial parameters")
 	parser.add_option("-s","--simu_version", default="1", help="dataset version")
 	parser.add_option("-u","--position1", default="902205", help="position1")
