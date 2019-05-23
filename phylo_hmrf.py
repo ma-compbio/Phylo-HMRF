@@ -283,32 +283,6 @@ class phyloHMRF(_BaseGraph):
 
 		return posteriors
 
-	def _compute_posteriors_graph_v1(self, X, label):
-		pairwise_potential = self._pairwise_compare(label)
-		weighted_prob = np.exp(self.logprob - pairwise_potential)
-		sum1 = np.sum(weighted_prob,axis=1).reshape((-1,1))
-		temp1 = np.dot(sum1,1.0*np.ones((1,self.n_components)))
-		posteriors = weighted_prob/temp1
-
-		self.q_edge = np.sum(posteriors*pairwise_potential)
-		self.pairwise_potential = pairwise_potential.copy()
-
-		return posteriors
-
-	def _compute_posteriors_graph_test(self,len_vec, X, region_id, posteriors_test, posteriors_test1):
-
-		s1, s2 = len_vec[region_id][1], len_vec[region_id][2]
-		temp1 = np.mean(X[s1:s2],0)
-		posteriors_test = posteriors_test + temp1
-		posteriors_test1.append(temp1)
-
-		self.queue.put((region_id,s1,s2,temp1))
-		print region_id,s1,s2,temp1
-
-		time.sleep(5)
-
-		return (s1,s2,temp1)
-
 	def _compute_posteriors_graph_v1(self, X, label, logprob, region_id):
 
 		self.neighbor_vec = self.neighbor_vec2[region_id]
@@ -1348,7 +1322,8 @@ class phyloHMRF(_BaseGraph):
 				# print "nan in params restart: use initial parameter estimates %s"%(lik)
 				# print "nan1"
 
-			print("ou_lik_varied_constraint, lik ",lik)
+			# print("ou_lik_varied_constraint, lik ",lik)
+			
 			return lik
 
 		print("ou_lik_varied_constraint %d %d"%(state_id,flag))
