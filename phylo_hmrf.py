@@ -2072,6 +2072,7 @@ def run(num_states,chromosome,length_vec,root_path,multiple,species_name,
 	filename3 = "%s/estimate_ou_%d_%.2f_%d_s%d.%s.txt"%(path_1, run_id, lambda_0, n_components1, version, annot2)
 
 	mdict = {}
+	mdict['lenvec'] = len_vec
 	mdict['params_vecList'] = params_vecList
 	mdict['state_vecList'] = state_vecList
 	mdict['params_vec'], mdict['params_vec1'], mdict['iter_id1'], mdict['iter_id2'], mdict['cost_vec'] = params_vec, params_vec1, iter_id1, iter_id2, cost_vec
