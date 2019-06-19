@@ -52,6 +52,7 @@ Phylo-HMRF requires the following packages to be installed:
 - NumPy (tested on version 1.15.2)
 - SciPy (tested on version 0.18.0)
 - pandas (tested on version 0.18.1)
+- Python wrapper for GCO library: pygco (Please refer to https://github.com/yujiali/pygco to install pygco)
 
 You could install the Anaconda (avilable from https://www.continuum.io/downloads) for convenience, which provides a open souce collection of widely used data science packages including Python and NumPy.
 
