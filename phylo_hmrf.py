@@ -1904,7 +1904,7 @@ def run(num_states,chromosome,length_vec,root_path,multiple,species_name,
 
 		print region_list
 
-	# load region_list
+	# load filename_list
 	filename2 = "%s/path_list.txt"%(data_path)
 	if(os.path.exists(filename2)==True):
 		f = open(filename2, 'r')
