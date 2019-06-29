@@ -37,7 +37,3 @@ for i = 1:chrom_num
     
 end
 
-
-
-
-
