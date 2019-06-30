@@ -98,3 +98,4 @@ The format is the same as estimate_testChromID.regionID.ori.txt
 
 vi. FILEIDX_chrChromID_region[regionID]_windowSize_iterID2.jpg
 visualization of the filtered state estimation results in estimate_testChromID.regionID.filtered.txt as a color image for each synteny region on each chromosome
+
