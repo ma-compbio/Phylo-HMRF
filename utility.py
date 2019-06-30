@@ -54,7 +54,8 @@ def merge_contact_file(path1, output_filename1):
 	for i in range(0,num1):
 		chrom_id = chrom_vec[i]
 		print chrom_id
-		filename1 = '%s/chr%d.observed.kr.50K.txt'%(path1,chrom_id)
+		filename1 = '%s/chr%d.50K.txt'%(path1,chrom_id)
+		# filename1 = '%s/chr%d.observed.kr.50K.txt'%(path1,chrom_id)
 		data1 = pd.read_table(filename1,header=None)
 		colnames = list(data1)
 		# start1, start2, value = data1[colnames[0]], data1[colnames[1]], data1[colnames[2]]
@@ -80,6 +81,7 @@ def merge_estimate_file(path1, species_vec, output_filename1):
 
 	chrom_vec = np.asarray(range(1,23))
 	colnames1 = ['chrom','start1','start2','value']
+	# 17	250000	300000	17	1900000	1950000	8	1.6882	1.4702	1.7545	0.9343
 	num1 = len(chrom_vec)
 	for i in range(0,num1):
 		chrom_id = chrom_vec[i]
@@ -131,24 +133,6 @@ def intersect_region(file1, file2):
 	print "matched_Idx", len(matched_Idx), len(matched_Idx)*1.0/len(serial1)
 	
 	return matched_Idx, serial2
-
-def extend_bed(filename,extension1,output_filename):
-
-	data1 = pd.read_table(filename,header=None)
-	chrom, start, stop = data1[0], data1[1], data1[2]
-	serial = np.asarray(range(0,len(chrom)))
-	
-	start = start - extension1
-	start[start<0] = 0
-	stop = stop + extension1
-
-	# colnames = list(data1)
-	colnames = ['chrom','start','stop','serial']
-	data2 = pd.DataFrame(columns=colnames)
-	data2['chrom'], data2['start'], data2['stop'], data2['serial'] = chrom, start, stop, serial
-	data2.to_csv(output_filename,header=False,index=False,sep='\t')
-
-	return True
 
 def write_tobed(filename,output_filename):
 
@@ -366,18 +350,18 @@ def load_data_chromosome_sub1_2(chrom_id, x_max, x_min, resolution, num_neighbor
 
 	position = np.asarray(data_ori.loc[:,colnames[0:3]])
 	x1 = np.asarray(data_ori.loc[:,colnames[3:]])
-	print x1.shape
+	# print x1.shape
 	# print x1[0:10]
 	
 	x1, vec1, x_min, x_max = normalize_feature(x1,x_min,x_max)
-	print np.max(x1,axis=0), np.min(x1,axis=0), np.std(x1,axis=0)
-	print vec1
+	# print np.max(x1,axis=0), np.min(x1,axis=0), np.std(x1,axis=0)
+	# print vec1
 
 	# log transformation
 	x = np.log(1+x1)
 
 	# num_neighbor = 8
-	print "num_neighbor: %d"%(num_neighbor)
+	# print "num_neighbor: %d"%(num_neighbor)
 	type_id = 0
 
 	region_list = []
@@ -424,7 +408,7 @@ def load_data_chromosome_sub1_2(chrom_id, x_max, x_min, resolution, num_neighbor
 	else:
 		region_list2 = region_list2_ori
 
-	print "diagonal_typeId, region_list2", diagonal_typeId, region_list2
+	# print "diagonal_typeId, region_list2", diagonal_typeId, region_list2
 
 	filter_param1, filter_param2 = -1, -1
 
@@ -507,7 +491,7 @@ def load_data_chromosome_sub3(region_id, chrom_id, region_list, x, position, par
 	if (position1==position1a) and (position2==position2a):
 		type_id1 = 1
 	
-	print position1, position2, position1a, position2a, region_id, type_id1
+	# print position1, position2, position1a, position2a, region_id, type_id1
 	# output_filename3 = "%s/chr%s.%dKb.select2.%s.%d.%d.R5.test.1.txt"%(output_path,chrom,int(resolution/1000),annot1,position1,position2)
 
 	output_filename = ""
@@ -573,7 +557,7 @@ def load_data_chromosome_sub3_position(region_id, chrom_id, region_list, x, posi
 	if (position1==position1a) and (position2==position2a):
 		type_id1 = 1
 	
-	print position1, position2, position1a, position2a, region_id, type_id1
+	# print position1, position2, position1a, position2a, region_id, type_id1
 	# output_filename3 = "%s/chr%s.%dKb.select2.%s.%d.%d.R5.test.1.txt"%(output_path,chrom,int(resolution/1000),annot1,position1,position2)
 
 	output_filename = ""
@@ -889,7 +873,7 @@ def normalize_feature(x1,x_min,x_max):
 		x_max = max1
 		# x_max = np.exp(max1)-1
 
-	print x_min, x_max
+	# print x_min, x_max
 
 	for i in range(0,n2):
 		x = x1[:,i]
@@ -921,7 +905,7 @@ def normalize_feature2(position,x1,x_min,x_max,norm_typeId=0):
 		x_max = max1
 		# x_max = np.exp(max1)-1
 
-	print x_min, x_max
+	# print x_min, x_max
 
 	threshold1 = 0.997
 	threshold2 = 0.9545
@@ -946,7 +930,7 @@ def normalize_feature2(position,x1,x_min,x_max,norm_typeId=0):
 
 		b_1 = np.where(x>limit1)[0]
 		ratio = len(b_1)*1.0/len(x)
-		print "normalize %d %d %.2f %d %.2f"%(norm_typeId,i,limit1,len(b_1),ratio)
+		# print "normalize %d %d %.2f %d %.2f"%(norm_typeId,i,limit1,len(b_1),ratio)
 		if len(b_1)>0:
 			x[b_1] = limit1
 
@@ -969,140 +953,6 @@ def normalize_feature1(x1,x_min,x_max):
 	vec1 = np.asarray(vec1)
 
 	return x1, vec1
-
-def quantileNormalize(df_input):
-	df = df_input.copy()
-	#compute rank
-	dic = {}
-	for col in df:
-		dic.update({col : sorted(df[col])})
-	sorted_df = pd.DataFrame(dic)
-	rank = sorted_df.mean(axis = 1).tolist()
-	#sort
-	for col in df:
-		t = np.searchsorted(np.sort(df[col]), df[col])
-		df[col] = [rank[i] for i in t]
-	return df
-
-def reciprocal_mapping(ref_filename,filename1,filename2,output_filename,annot):
-
-	table1 = pd.read_table(filename1,header=None)
-	columns1 = list(table1.columns.values)
-	serial1 = table1[columns1[3]]
-
-	table2 = pd.read_table(filename2,header=None)
-	columns2 = list(table2.columns.values)
-	serial2 = table2[columns2[3]]
-
-	ref_table = pd.read_table(ref_filename,header=None)
-	ref_serial = ref_table[3]
-
-	t_serial = serial2
-	idx1 = np.int64(mapping_Idx(ref_serial,t_serial))
-
-	cnt = sum(idx1!=serial2)
-	print cnt
-	if cnt>0:
-		print "error!"
-	
-	t_table = ref_table.loc[idx1,:]
-	num1 = t_table.shape[0]
-	filename = '%s.subTable.txt'%(annot)
-	t_table.to_csv(filename,index=False,sep='\t')
-	
-	chrom, start, stop = t_table[0], t_table[1], t_table[2]
-	chrom2, start2, stop2 = table2[0], table2[1], table2[2]
-	b = (chrom2==chrom)&(start2<stop)&(stop2>start)
-	b = np.asarray(b)
-	b2 = np.where(b==True)[0]
-	serial2 = np.asarray(serial2)
-
-	if len(b2)>0:
-		t_serial1 = serial2[b2]	# reciprocal mapping indices
-	else:
-		print "error!"
-		return
-
-	filename = '%s.serial.txt'%(annot)
-	np.savetxt(filename,t_serial1,fmt='%d')
-	idx2 = np.int64(mapping_Idx(np.asarray(serial1),t_serial1))
-	filename = '%s.serial1.txt'%(annot)
-	temp1 = np.array((idx2,t_serial1)).T
-	np.savetxt(filename,temp1,fmt='%d')
-
-	sub_table1 = table1.loc[idx2,:]
-	sub_refTable = ref_table.loc[t_serial1,:]
-
-	filename = '%s.subtable.serial1.txt'%(annot)
-	sub_table1.to_csv(filename,index=False,sep='\t')
-
-	columns = ['chrom','start','stop','serial','chrom_'+annot,'start_'+annot,'stop_'+annot]
-	df1 = pd.DataFrame(columns=columns)
-	for i in range(0,4):
-		df1[columns[i]] = np.asarray(sub_refTable[i])
-	for i in range(0,3):
-		df1[columns[i+4]] = np.asarray(sub_table1[i])
-
-	df1.to_csv(output_filename,index=False,sep='\t')
-
-def reciprocal_mapping1(filename_list, annot_list, output_filename):
-
-	idx_list = []
-	serial_list = []
-	table_list = []
-	cnt = 0
-	for filename in filename_list:
-		data1 = pd.read_table(filename)
-		table_list.append(data1)
-		serial_list.append(np.asarray(data1['serial']))
-		cnt = cnt + 1
-
-	serial1 = serial_list[0]
-	for i in range(1,cnt):
-		serial1 = np.intersect1d(serial1,serial_list[i])
-
-	for i in range(0,cnt):
-		idx = mapping_Idx(serial_list[i],serial1)
-		if np.min(idx)<0:
-			print "error!", i
-		idx_list.append(idx)
-
-	# columns = ['chrom','start','stop','serial','chrom_'+annot1,'start_'+annot1,'stop_'+annot1]
-	df1 = table_list[0].loc[idx_list[0],:]
-	for i in range(1,cnt):
-		annot1 = annot_list[i]
-		print annot1
-		t_columns = ['chrom_'+annot1,'start_'+annot1,'stop_'+annot1]
-		for k in range(0,3):
-			df1[t_columns[k]] = np.asarray(table_list[i].loc[idx_list[i],t_columns[k]])
-		# df1[t_columns[1:3]] = df1[t_columns[1:3]].astype(int)
-	
-	# df1 = df1.infer_objects()
-
-	df1.to_csv(output_filename,index=False,sep='\t')
-
-	return df1
-
-def concatenate_1(filename1,filename2):
-	#idlist = np.loadtxt(filename2,dtype={'names':('start','len','interval'),
-	#									'formats':('int32','int32','int32')})
-	with open(filename1) as f:
-		filenames = f.readlines()
-	num = len(filenames)
-	print "filenames", num
-
-	fid = open(filename2,'w+')
-	num_vec = []
-	for filename in filenames:
-		filename = filename.rstrip('\n')
-		print filename
-		with open(filename) as f:
-			lines = f.readlines()
-			num_vec.append(len(lines))
-			fid.writelines(lines)
-	
-	print num_vec
-	return num_vec
 
 # input:
 # filename1: estimated states
@@ -1249,7 +1099,7 @@ def edge_list_grid3_sym(data1, serial, window_size, output_filename, num_neighbo
 	edge_list = []
 	num_neighbor1 = int(num_neighbor/2)
 	cnt_vec = np.zeros(num_neighbor1)
-	print num_neighbor1
+	# print num_neighbor1
 	for i in range(0,num_neighbor1):
 		temp1 = neighbor_Idx[i]
 		print temp1[:,0:100]
@@ -1323,14 +1173,13 @@ def _edge_weight_undirected(self, X, edge_list_1, N):
 			edge_weightList[k] = np.exp(-beta1*temp1)
 
 	b = np.where(edge_list_1[:,0]<edge_list_1[:,1])[0]
-	print "id1<id2:%d"%(len(b))
+	# print "id1<id2:%d"%(len(b))
 
-	print "edge_list_1[b], edge_weightList[b]", edge_list_1[b].shape, edge_weightList[b].shape
+	# print "edge_list_1[b], edge_weightList[b]", edge_list_1[b].shape, edge_weightList[b].shape
 	edge_weightList_undirected = np.hstack((edge_list_1[b],edge_weightList[b][:,np.newaxis]))
 
 	#self.edge_weightList = edge_weightList
-	# print edge_weightList.shape
-	print edge_weightList.shape, edge_weightList_undirected.shape
+	# print edge_weightList.shape, edge_weightList_undirected.shape
 
 	position1 = edge_list_1[0,0]
 	filename = 'edge_weightList%d.txt'%(position1)
@@ -1484,14 +1333,6 @@ def select_valuesPosition1_2(position, x, output_filename, position1, position2,
 	thresh = 0
 	num1 = x.shape[1]
 	cnt_vec = np.zeros(num1)
-
-	for i in range(0,num1):
-		b2 = np.where(x[b1,i]>thresh)[0]
-		cnt_vec[i] = len(b2)
-	print "species cnt_vec",cnt_vec
-
-	num1 = x.shape[1]
-	cnt_vec = np.zeros(num1)
 	for i in range(0,num1):
 		b2 = np.where(x[b1,i]>thresh)[0]
 		cnt_vec[i] = len(b2)
@@ -1509,43 +1350,6 @@ def select_valuesPosition1_2(position, x, output_filename, position1, position2,
 		data2.to_csv(output_filename,index=False,sep='\t')
 
 	return x[b1,:], b1
-
-def degree_vertex(filename1, output_filename):
-
-	data1 = pd.read_table(filename1,header=None)
-	colnames = list(data1)
-
-	data1 = pd.read_table(filename1)
-
-	num1 = data1.shape[0]	# the number of entries
-	colnames = list(data1)	# chrom, x1, x2, serial, values
-	pos = np.asarray(data1.loc[:,colnames[1:3]])
-	
-	serial = np.zeros(num1)
-	n1, n2 = np.max(pos[:,0]), np.max(pos[:,1])
-	N = np.max((n1,n2))+1	# number of positions
-	print N
-
-	for i in range(0,num1):
-		x1, x2 = pos[i,0], pos[i,1]
-		serial[i] = size1*x1+x2
-
-	edge_list = []
-	for i in range(0,num1):
-		t_serial = serial[i]
-		t_neighbor = [t_serial-N,t_serial+1,t_serial+N,t_serial-1]
-		t_neighbor = np.asarray(t_neighbor)
-		for s1 in t_neighbor:
-			b1 = np.where(serial==s1)[0]
-			if len(b1)>0:
-				edge_list.append([i,b1[0]])
-
-	edge_list = np.asarray(edge_list)
-
-	if output_filename!='':
-		np.savetxt(output_filename,edge_list,fmt='%d')
-
-	return True
 
 # write feature vectors to image
 # def write_matrix_image_Ctrl(filename, output_filename1, output_filename2):
@@ -1634,8 +1438,8 @@ def write_matrix_image_Ctrl_v2(value, pos, output_filename1, output_filename2, n
 		temp1 = mtx1[:,:,k]
 		x1 = np.ravel(temp1)
 		b2 = np.where(x1>1e-05)[0]
-		print "after write_matrix_image_v1"
-		print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
+		# print "after write_matrix_image_v1"
+		# print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
 
 	m1 = mtx1.reshape((mtx1.shape[0]*mtx1.shape[1],dim1))
 	print "m1 ori",np.mean(m1,axis=0)
@@ -1644,8 +1448,8 @@ def write_matrix_image_Ctrl_v2(value, pos, output_filename1, output_filename2, n
 		temp1 = m1[:,k]
 		x1 = np.ravel(temp1)
 		b2 = np.where(x1>1e-05)[0]
-		print "after reshape"
-		print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
+		# print "after reshape"
+		# print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
 
 	dim1 = mtx1.shape[-1]
 	# sigma = 0.5
@@ -1654,15 +1458,15 @@ def write_matrix_image_Ctrl_v2(value, pos, output_filename1, output_filename2, n
 	for i in range(0,dim1):
 		temp1 = mtx1[:,:,i]
 		b = np.where(temp1<1e-05)[0]
-		print "species %d: %d"%(i,len(b))
+		# print "species %d: %d"%(i,len(b))
 		mtx1[:,:,i] = near_interpolation1(temp1, window_size)	# use median of neighbors for interpolation 
 
 		temp2 = mtx1[:,:,i]
 		b = np.where(temp2<1e-05)[0]
-		print "2 species %d: %d"%(i,len(b))
+		# print "2 species %d: %d"%(i,len(b))
 
 	m1 = mtx1.reshape((mtx1.shape[0]*mtx1.shape[1],dim1))
-	print "m1",np.mean(m1,axis=0)
+	# print "m1",np.mean(m1,axis=0)
 
 	if filter_mode==0:
 		
@@ -1716,18 +1520,18 @@ def write_matrix_image_Ctrl_unsym1(value, pos, output_filename1, output_filename
 		temp1 = mtx1[:,:,k]
 		x1 = np.ravel(temp1)
 		b2 = np.where(x1>1e-05)[0]
-		print "after write_matrix_image_v1"
-		print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
+		# print "after write_matrix_image_v1"
+		# print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
 
 	m1 = mtx1.reshape((mtx1.shape[0]*mtx1.shape[1],dim1))
-	print "m1 ori",np.mean(m1,axis=0)
+	# print "m1 ori",np.mean(m1,axis=0)
 
 	for k in range(0,dim1):
 		temp1 = m1[:,k]
 		x1 = np.ravel(temp1)
 		b2 = np.where(x1>1e-05)[0]
-		print "after reshape"
-		print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
+		# print "after reshape"
+		# print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
 
 	dim1 = mtx1.shape[-1]
 	# sigma = 0.5
@@ -1742,10 +1546,10 @@ def write_matrix_image_Ctrl_unsym1(value, pos, output_filename1, output_filename
 
 		temp2 = mtx1[:,:,i]
 		b = np.where(temp2<1e-05)[0]
-		print "2 species %d: %d"%(i,len(b))
+		# print "2 species %d: %d"%(i,len(b))
 
 	m1 = mtx1.reshape((mtx1.shape[0]*mtx1.shape[1],dim1))
-	print "m1",np.mean(m1,axis=0)
+	# print "m1",np.mean(m1,axis=0)
 
 	if filter_mode==0:
 		
@@ -1801,8 +1605,8 @@ def write_matrix_image_Ctrl_unsym1_position(value, pos, output_filename1, output
 		temp1 = mtx1[:,:,k]
 		x1 = np.ravel(temp1)
 		b2 = np.where(x1>1e-05)[0]
-		print "after write_matrix_image_v1"
-		print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
+		# print "after write_matrix_image_v1"
+		# print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
 
 	m1 = mtx1.reshape((mtx1.shape[0]*mtx1.shape[1],dim1))
 	print "m1 ori",np.mean(m1,axis=0)
@@ -1811,8 +1615,8 @@ def write_matrix_image_Ctrl_unsym1_position(value, pos, output_filename1, output
 		temp1 = m1[:,k]
 		x1 = np.ravel(temp1)
 		b2 = np.where(x1>1e-05)[0]
-		print "after reshape"
-		print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
+		# print "after reshape"
+		# print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
 
 	dim1 = mtx1.shape[-1]
 	# sigma = 0.5
@@ -1822,12 +1626,12 @@ def write_matrix_image_Ctrl_unsym1_position(value, pos, output_filename1, output
 	for i in range(0,dim1):
 		temp1 = mtx1[:,:,i]
 		b = np.where(temp1<1e-05)[0]
-		print "species %d: %d"%(i,len(b))
-		mtx1[:,:,i] = near_interpolation1(temp1, window_size)	# use median of neighbors for interpolation 
+		# print "species %d: %d"%(i,len(b))
+		# mtx1[:,:,i] = near_interpolation1(temp1, window_size)	# use median of neighbors for interpolation 
 
 		temp2 = mtx1[:,:,i]
 		b = np.where(temp2<1e-05)[0]
-		print "2 species %d: %d"%(i,len(b))
+		# print "2 species %d: %d"%(i,len(b))
 
 	m1 = mtx1.reshape((mtx1.shape[0]*mtx1.shape[1],dim1))
 	print "m1",np.mean(m1,axis=0)
@@ -1873,7 +1677,7 @@ def write_matrix_image_Ctrl_unsym1_position(value, pos, output_filename1, output
 	t_data1 = data1[b2,:]
 	t_serial = serial_2
 
-	print "value_index1, value_index2", len(value_index1), len(value_index2), len(serial1), len(serial2), len(serial_1), len(serial_2)
+	# print "value_index1, value_index2", len(value_index1), len(value_index2), len(serial1), len(serial2), len(serial_1), len(serial_2)
 	
 	window_size = mtx1.shape[0]
 	# num_neighbor = 8
@@ -1900,8 +1704,8 @@ def write_matrix_image_Ctrl_sym1(value, pos, output_filename1, output_filename2,
 		temp1 = mtx1[:,:,k]
 		x1 = np.ravel(temp1)
 		b2 = np.where(x1>1e-05)[0]
-		print "after write_matrix_image_v1"
-		print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
+		# print "after write_matrix_image_v1"
+		# print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
 
 	m1 = mtx1.reshape((mtx1.shape[0]*mtx1.shape[1],dim1))
 	print "m1 ori",np.mean(m1,axis=0)
@@ -1910,8 +1714,8 @@ def write_matrix_image_Ctrl_sym1(value, pos, output_filename1, output_filename2,
 		temp1 = m1[:,k]
 		x1 = np.ravel(temp1)
 		b2 = np.where(x1>1e-05)[0]
-		print "after reshape"
-		print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
+		# print "after reshape"
+		# print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
 
 	dim1 = mtx1.shape[-1]
 	# sigma = 0.5
@@ -1920,12 +1724,12 @@ def write_matrix_image_Ctrl_sym1(value, pos, output_filename1, output_filename2,
 	for i in range(0,dim1):
 		temp1 = mtx1[:,:,i]
 		b = np.where(temp1<1e-05)[0]
-		print "species %d: %d"%(i,len(b))
+		# print "species %d: %d"%(i,len(b))
 		mtx1[:,:,i] = near_interpolation1a(temp1, window_size)	# use median of neighbors for interpolation 
 
 		temp2 = mtx1[:,:,i]
 		b = np.where(temp2<1e-05)[0]
-		print "2 species %d: %d"%(i,len(b))
+		# print "2 species %d: %d"%(i,len(b))
 
 	m1 = mtx1.reshape((mtx1.shape[0]*mtx1.shape[1],dim1))
 	print "m1",np.mean(m1,axis=0)
@@ -1980,8 +1784,8 @@ def write_matrix_image_Ctrl_v2_unprocess(value, pos, output_filename1, output_fi
 		temp1 = mtx1[:,:,k]
 		x1 = np.ravel(temp1)
 		b2 = np.where(x1>1e-05)[0]
-		print "after write_matrix_image_v1"
-		print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
+		# print "after write_matrix_image_v1"
+		# print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
 
 	output_filename1 = "test1.txt"
 	data1, pos_idx, serial = write_matrix_array_v1(mtx1, start_region, output_filename1, type_id)
@@ -2066,8 +1870,8 @@ def edge_weightlist_grid3_undirected_unsym(data1, serial, window_size, output_fi
 	x = np.int64(serial/N)	# row index
 	y = serial%N  # column index
 
-	print x,y
-	print serial[0:100]
+	# print x,y
+	# print serial[0:100]
 
 	t_idx = np.asarray(range(0,N*N))
 	m_idx = mapping_Idx(t_idx,serial)
@@ -2076,7 +1880,7 @@ def edge_weightlist_grid3_undirected_unsym(data1, serial, window_size, output_fi
 	t_idx1[m_idx] = t_serial
 
 	diagonal_idx = np.where(x==y)[0]
-	print "diagonal_idx: %d"%(len(diagonal_idx))
+	# print "diagonal_idx: %d"%(len(diagonal_idx))
 
 	neighbor_Idx = dict()
 	if num_neighbor==8:
@@ -2092,7 +1896,7 @@ def edge_weightlist_grid3_undirected_unsym(data1, serial, window_size, output_fi
 	edge_weightList = []
 	num_neighbor1 = int(num_neighbor/2)
 	cnt_vec = np.zeros(num_neighbor1)
-	print num_neighbor1
+	# print num_neighbor1
 	X_norm = np.sqrt(np.sum(data1*data1,axis=1))
 
 	small_eps = 1e-16
@@ -2104,36 +1908,36 @@ def edge_weightlist_grid3_undirected_unsym(data1, serial, window_size, output_fi
 		id_1 = np.intersect1d(b1,b2)
 		serial1 = temp1[0,id_1]*N + temp1[1,id_1]
 		
-		print serial.shape, serial1.shape
+		# print serial.shape, serial1.shape
 		
 		b_1 = mapping_Idx(serial,serial1)
 		b_2 = np.where(b_1>=0)[0]
 
-		print "serial1, b_2", serial1.shape, b_2.shape
+		# print "serial1, b_2", serial1.shape, b_2.shape
 		
 		id1 = id_1[b_2]
 		id2 = b_1[b_2]
 
-		print id1, id2
+		# print id1, id2
 		x1, x2 = data1[id1], data1[id2]
 		d1 = np.sum((x1-x2)**2,1)
-		print "x1", x1[0:10]
-		print "x2", x2[0:10]
-		print "d1", d1[0:10]
+		# print "x1", x1[0:10]
+		# print "x2", x2[0:10]
+		# print "d1", d1[0:10]
 		weight = d1/(X_norm[id1]*X_norm[id2]+small_eps)
 		# weight = np.exp(-beta1*weight)
 
 		b1a = np.where(temp1[0]==temp1[1])[0]
 		b1a = np.intersect1d(diagonal_idx,b1a)
-		print "b1a %d"%(len(b1a))
+		# print "b1a %d"%(len(b1a))
 		
 		if len(b1a)>0:
 			serial1a = temp1[0,b1a]*N + temp1[1,b1a]
-			print "serial1a", serial1a
+			# print "serial1a", serial1a
 			b_1a = mapping_Idx(serial1[b_2],serial1a)
 			b_2a = np.where(b_1a>=0)[0]
 			id3 = b_1a[b_2a]
-			print "id3: %d"%(len(id3))
+			# print "id3: %d"%(len(id3))
 			weight[id3] = 0.5*weight[id3] # edge weight between diagonal nodes
 
 		temp3 = np.hstack((np.asarray((id1,id2)).T,weight[:, np.newaxis]))
@@ -2143,7 +1947,7 @@ def edge_weightlist_grid3_undirected_unsym(data1, serial, window_size, output_fi
 	edge_list = np.asarray(edge_list)
 	edge_list = _sort_array(edge_list)
 
-	print "edge_list shape", edge_list.shape
+	# print "edge_list shape", edge_list.shape
 
 	if output_filename!='':
 		# np.savetxt(output_filename,edge_list,fmt='%d',delimiter='\t')
@@ -2170,7 +1974,7 @@ def edge_weightlist_grid3_undirected(data1, serial, window_size, output_filename
 	y = serial%N2  # column index
 
 	diagonal_idx = np.where(x==y)[0]
-	print "diagonal_idx: %d"%(len(diagonal_idx))
+	# print "diagonal_idx: %d"%(len(diagonal_idx))
 
 	neighbor_Idx = dict()
 	if num_neighbor==8:
@@ -2186,7 +1990,7 @@ def edge_weightlist_grid3_undirected(data1, serial, window_size, output_filename
 	edge_weightList = []
 	num_neighbor1 = int(num_neighbor/2)
 	cnt_vec = np.zeros(num_neighbor1)
-	print num_neighbor1
+	# print num_neighbor1
 	X_norm = np.sqrt(np.sum(data1*data1,axis=1))
 
 	small_eps = 1e-16
@@ -2197,22 +2001,22 @@ def edge_weightlist_grid3_undirected(data1, serial, window_size, output_filename
 		id_1 = b2
 		serial1 = temp1[0,id_1]*N2 + temp1[1,id_1]
 		
-		print serial.shape, serial1.shape
+		# print serial.shape, serial1.shape
 		
 		b_1 = mapping_Idx(serial,serial1)
 		b_2 = np.where(b_1>=0)[0]
 
-		print "serial1, b_2", serial1.shape, b_2.shape
+		# print "serial1, b_2", serial1.shape, b_2.shape
 		
 		id1 = id_1[b_2]	# directed to
 		id2 = b_1[b_2]	# directed from
 
-		print id1, id2
+		# print id1, id2
 		x1, x2 = data1[id1], data1[id2]
 		d1 = np.sum((x1-x2)**2,1)
-		print "x1", x1[0:10]
-		print "x2", x2[0:10]
-		print "d1", d1[0:10]
+		# print "x1", x1[0:10]
+		# print "x2", x2[0:10]
+		# print "d1", d1[0:10]
 		weight = d1/(X_norm[id1]*X_norm[id2]+small_eps)
 		# weight = np.exp(-beta1*weight)
 
@@ -2321,22 +2125,6 @@ def subregion1(filename, chrom_id, resolution, region_points, type_id):
 	# vec1 = np.asarray(region_list)
 	num1 = len(region_points)
 
-	# if type_id==1:
-	# 	for k in range(0,num1):
-	# 		vec1 = np.asarray(region_list)
-	# 		point1, point2 = region_points[k][0], region_points[k][1]
-	# 		temp1 = (vec1[:,0]<point1-threshold)&(vec1[:,1]>point2+threshold)
-	# 		b = np.where(temp1==True)[0]
-
-	# 		if len(b)>0:
-	# 			id1 = b[0]
-	# 			region_id = vec1[id1,3]
-	# 			start1, stop1 = vec1[id1,0], point1
-	# 			start2, stop2 = point2, vec1[id1,1]
-	# 			length1, length2 = stop1 - start1, stop2 - start2
-	# 			region_list[id1] = [start2,stop2,length2,region_id]
-	# 			region_list.insert(id1,[start1,stop1,length1,region_id])
-
 	for k in range(0,num1):
 		vec1 = np.asarray(region_list)
 		point1, point2 = region_points[k][0], region_points[k][1]
@@ -2374,7 +2162,7 @@ def subregion1(filename, chrom_id, resolution, region_points, type_id):
 			n1 = len(b)
 			for i in range(0,n1):
 				for j in range(i,n1):
-					print "i,j", i,j
+					# print "i,j", i,j
 					t_position1, t_position2 = region_list[b[i]], region_list[b[j]]
 					position1, position2, length = t_position1[0], t_position1[1], t_position1[2]
 					position1a, position2a, length_1 = t_position2[0], t_position2[1], t_position2[2]
@@ -2469,14 +2257,6 @@ def write_matrix_image_v1_mask(value, pos, output_filename1):
 
 	temp1 = np.sum(mtx1,2)
 
-	# filename1 = 'chrom_quantile.txt'
-	# #np.savetxt(filename1, m_vec_list, fmt='%.4f', delimiter='\t')
-
-	# vec1 = pd.read_table(filename1,header=None)
-	# m_values = vec1[6]
-	# x_max = np.median(m_values)
-	# print x_max
-
 	threshold1 = 0
 	value_index1 = np.where(temp1.ravel()>threshold1)[0]	# the positions with values
 	temp1[temp1<=threshold1] = 0
@@ -2563,10 +2343,7 @@ def write_matrix_image_v1a(value, pos, output_filename1):
 	for i in range(0,n_samples):
 		id1, id2 = pos[i,0]-start_region1, pos[i,1]-start_region2		
 		mtx1[id1,id2] = value[i,:]
-		#if id1>id2:
-		#	print "%d error!"%(i)
 
-		#mtx1[id2,id1] = value[i,:]
 		if i%100000==0:
 			print i, id1, id2, value[i,:]
 
@@ -2758,7 +2535,7 @@ def multi_contact_matrix3A(chrom, resolution, ref_chromsize, filename_list, spec
 		value[b1] = -1
 		
 		num2 = len(b1)
-		print num1, num2
+		# print num1, num2
 
 		value_dict[species_id] = t_vec_serial	# serial
 		value_dict1[species_id] = [x1,x2,value]	# value
@@ -2772,7 +2549,7 @@ def multi_contact_matrix3A(chrom, resolution, ref_chromsize, filename_list, spec
 		serial2 = np.intersect1d(serial2,t_serial2[i])
 
 	n1, n2 = len(serial1), len(serial2)
-	print "union, intersection", n1, n2
+	# print "union, intersection", n1, n2
 
 	colnames = [0,1,2]
 	colnames.extend(species)
@@ -2803,9 +2580,7 @@ def multi_contact_matrix3A_single(chrom, resolution, ref_chromsize, filename_lis
 	t_serial2 = []
 
 	cnt = 3
-
-	species_num = len(species)
-	
+	species_num = len(species)	
 	value_dict = dict()
 	value_dict1 = dict()
 	serial1 = []
@@ -2815,10 +2590,10 @@ def multi_contact_matrix3A_single(chrom, resolution, ref_chromsize, filename_lis
 
 		input_path = filename_list[i]
 		species_id = species[i]
-		print(species_id)
+		# print(species_id)
 
-		# filename1 = "%s/chr%s.%dK.txt"%(input_path,chrom,int(resolution/1000))
-		filename1 = "%s/chr%s.observed.kr.%dK.txt"%(input_path,chrom,int(resolution/1000))
+		filename1 = "%s/chr%s.%dK.txt"%(input_path,chrom,int(resolution/1000))
+		# filename1 = "%s/chr%s.observed.kr.%dK.txt"%(input_path,chrom,int(resolution/1000))
 		if os.path.exists(filename1)==False:
 			print "File %s does not exist. Please check."%(filename1)
 			return False
@@ -2834,7 +2609,7 @@ def multi_contact_matrix3A_single(chrom, resolution, ref_chromsize, filename_lis
 		value[b1] = -1
 		
 		num2 = len(b1)
-		print num1, num2
+		# print num1, num2
 
 		value_dict[species_id] = t_vec_serial	# serial
 		value_dict1[species_id] = [x1,x2,value]	# value
@@ -2858,7 +2633,7 @@ def output_multi_contactMtx(serial1, colnames, species, value_dict, value_dict1,
 		temp1 = value_dict[species_id]	# serial
 		temp2 = value_dict1[species_id]	# value
 		x1, x2, value = temp2[0], temp2[1], temp2[2]
-		print len(temp1)
+		# print len(temp1)
 		idx = mapping_Idx(serial1,temp1)
 		b1 = np.where(idx>=0)[0]
 		if len(b1)>0:
@@ -2905,8 +2680,6 @@ def chrom_contactMtx(input_filename,chrom):
 def overlap_openChromatin(loc1, loc2):
 
 	chrom1, start1, stop1 = loc1['chr'], loc1['start'], loc1['stop']		# feature region
-	# chrom2, start2, stop2 = data2['chr'], data2['start'], data2['stop']		# open chromatin
-	# chrom2, start2, stop2 = loc2[1], loc2[3], loc2[4]	# open chromatin
 	chrom2, start2, stop2 = loc2[0], loc2[1], loc2[2]	# open chromatin
 	
 	chrom_vec = list(set(list(chrom1)))
@@ -2936,99 +2709,3 @@ def overlap_openChromatin(loc1, loc2):
 	
 	sel_idx=list(set(sel_idx))
 	return sel_idx
-
-def overlap_openChromatinRegion1(base_id, chrom1, start1, stop1, filename2):
-
-	data2 = pd.read_table(filename2, header=None)	# open chromatin
-	chrom2, start2, stop2 = data2[0], np.array(data2[1]), np.array(data2[2])
-	pos2 = np.array((start2,stop2)).T
-
-	chrom_vec = list(set(list(chrom2)))
-	print chrom_vec
-	chrom_num = len(chrom_vec)  # number of chromosomes
-	chrom_dict = dict()
-	
-	for item in chrom_vec:
-		idx = np.where(chrom2==item)[0]
-		print item, idx
-		chrom_dict[item] = idx  # record indices of chromosome
-
-	num1 = chrom1.shape[0]  # number of chromosomes of feature regions
-	num2 = chrom2.shape[0]	# number of chromosomes of open chromatin regions
-		
-	print chrom_dict
-	len_vec = np.zeros(num1)
-	for j in range(0,num1):
-		if j%5000==0:
-			print j
-		#if j>=1000:
-		#	break
-		t_chrom = chrom1[j]
-		if t_chrom in chrom_dict:
-			s1, s2 = start1[j], stop1[j]
-			if s1<0 or s2<0:
-				continue
-
-			b1 = chrom_dict[t_chrom] # index of open chromatin regions in one chromosome
-			b2 = (start2[b1]<s2)&(stop2[b1]>s1)
-			b = b1[np.where(b2==True)[0]]
-			if b.shape[0]>0:
-				tmp = pos2[b]
-				tmp[tmp[:,0]<s1,0] = s1
-				tmp[tmp[:,1]>s2,1] = s2
-				len_vec[j] = np.sum(tmp[:,1]-tmp[:,0])
-	
-	return len_vec
-	
-def serial_region(filename,output_filename,output_filename1):
-
-	data1 = pd.read_table(filename,header=None)
-	chrom, start, stop = data1[0], data1[1], data1[2]
-	num1 = len(chrom)
-	data1['serial'] = range(0,num1)
-	# data1.to_csv(output_filename,header=False,index=False,sep='\t')
-
-	chrname_vec = list(set(list(chrom)))
-	chrname_dict = dict()
-	chr_startIdx = pd.DataFrame(columns=['chrom','start'])
-	start_Idx = []
-
-	for chrname1 in chrname_vec:
-		b1 = (chrom==chrname1)
-		idx = np.where(b1==True)[0]
-		print chrname1, len(idx)
-		chrname_dict[chrname1] = idx
-		start_Idx.append(idx[0])
-
-	chr_startIdx['chrom'], chr_startIdx['start'] = chrname_vec, start_Idx
-	chr_startIdx.to_csv(output_filename,index=False,header=False,sep='\t')
-
-	return chr_startIdx
-
-def compare_serial(data1,filename2):
-
-	# data1 = pd.read_table(filename1,header=None)
-	chrom1, start1, stop1, serial1 = data1[0], data1[1], data1[2], data1[4]
-
-	data2 = pd.read_table(filename2,header=None)
-	chrom2, start2, stop2, serial2, serial2a = data2[0], data2[1], data2[2], data2[4], data2[5]
-	num1 = len(serial2)
-	cnt = 0
-	for i in range(0,num1):
-		if i%500000==0:
-			print i
-		id1 = serial2[i]
-		t_chrom, t_start, t_stop, t_serial = chrom1[id1], start1[id1], stop1[id1], serial1[id1]
-		if (id1!=t_serial) or (t_chrom!=chrom2[i]) or (t_start!=start2[i]):
-			print "error!"
-			cnt = cnt + 1
-
-		if serial2[i]!=serial2a[i]:
-			id1 = serial2a[i]
-			t_chrom, t_start, t_stop, t_serial = chrom1[id1], start1[id1], stop1[id1], serial1[id1]
-			if (id1!=t_serial) or (t_chrom!=chrom2[i]) or (t_stop!=stop2[i]):
-				print "error!"
-				cnt = cnt + 1
-
-	print cnt
-	return cnt

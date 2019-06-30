@@ -519,7 +519,7 @@ class phyloHMRF(_BaseGraph):
 		logprob = self._compute_log_likelihood(X)
 		unary_cost1 = -logprob.copy()
 
-		print "unary cost max min median mean %.2f %.2f %.2f %.2f"%(np.max(unary_cost1),np.min(unary_cost1),np.median(unary_cost1),np.mean(unary_cost1))
+		# print "unary cost max min median mean %.2f %.2f %.2f %.2f"%(np.max(unary_cost1),np.min(unary_cost1),np.median(unary_cost1),np.mean(unary_cost1))
 
 		max_cycles1 = 5000
 		print unary_cost1.shape
@@ -674,12 +674,12 @@ class phyloHMRF(_BaseGraph):
 			edge_weightList[k] = np.exp(-beta1*temp1)
 
 		b = np.where(edge_list_1[:,0]<edge_list_1[:,1])[0]
-		print "id1<id2:%d"%(len(b))
+		# print "id1<id2:%d"%(len(b))
 		edge_idList_undirected = edge_list_1[b]
 		edge_weightList_undirected = edge_weightList[b]
 
 		# print edge_weightList.shape
-		print edge_weightList.shape, edge_weightList_undirected.shape
+		# print edge_weightList.shape, edge_weightList_undirected.shape
 
 		#filename = 'edge_weightList_undirected%d.txt'%(position1)
 		filename = 'edge_weightList_undirected.txt'
@@ -800,16 +800,16 @@ class phyloHMRF(_BaseGraph):
 		node_vec = []
 		if idx.shape[0]==0:
 			node_vec = [index]  # the leaf node 
-			print "leaf", node_vec
+			# print "leaf", node_vec
 		else:
 			for j in idx:
 				node_vec1 = self._sub_tree_leaf(j)
 				node_vec = node_vec + node_vec1
-				print "interior", node_vec
+				# print "interior", node_vec
 
 		self.branch_vec[index] = node_vec  # all the leaf nodes that can be reached from this node
 		
-		print "branch_dim", index, node_vec
+		# print "branch_dim", index, node_vec
 
 		return node_vec
 
@@ -831,7 +831,7 @@ class phyloHMRF(_BaseGraph):
 				for k in range(j,num1):
 					self.base_struct[i].append(np.array((list1[j],list1[k])))
 
-		print "index built"
+		# print "index built"
 		if node_num>2:
 			print self.branch_vec[1], self.branch_vec[2]
 		return leaf_list
@@ -938,19 +938,19 @@ class phyloHMRF(_BaseGraph):
 		tree_mtx = self.tree_mtx
 		leaf_vec = self.leaf_vec
 
-		print self.branch_dim
+		# print self.branch_dim
 		n2, N2 = self.node_num, self.node_num   # assign a branch to the first node
 		n1 = np.array(leaf_vec).shape[0]        # the number of leaf nodes 
 		N1 = int(n1*(n1-1)/2)
 
-		print N1, N2
+		# print N1, N2
 		# common_ans = np.zeros((N1,1))
 		pair_list, parent_list = [], [None]*n2
 
 		A1 = np.zeros((n1,n2))  # leaf node number by branch dim
-		print "path_vec", self.path_vec
-		for i in range(0,n1):
-			print leaf_vec[i], self.path_vec[i]
+		# print "path_vec", self.path_vec
+		# for i in range(0,n1):
+		# 	print leaf_vec[i], self.path_vec[i]
 
 		for i in range(0,n2):
 			b = np.where(tree_mtx[:,i]>0)[0]
@@ -1495,7 +1495,7 @@ class phyloHMRF(_BaseGraph):
 				initial_guess = (a1*self.init_ou_params[state_id].copy() 
 							+ a2*self.params_vec1[state_id].copy()
 							+ (1-a1-a2)*random1)
-				print("initial guess", initial_guess)
+				# print("initial guess", initial_guess)
 				
 				res = minimize(self._ou_lik_varied_constraint, initial_guess, args = (state_id),
 							method = method_vec[method_id], constraints=con1, tol=1e-6, options={'disp': False})
@@ -1609,7 +1609,7 @@ class phyloHMRF(_BaseGraph):
 
 		initial_guess = self._ou_init_guess(mean_values)
 
-		print "initial guess", initial_guess
+		# print "initial guess", initial_guess
 		
 		method_vec = ['L-BFGS-B','BFGS','SLSQP','Nelder-Mead','Newton-CG']
 		id1 = 0
@@ -1638,7 +1638,7 @@ class phyloHMRF(_BaseGraph):
 		# print denom
 
 		if 'c' in self.params:
-			print "flag: true covariance"
+			# print "flag: true covariance"
 
 			for c in range(self.n_components):
 				print "state_id: %d"%(c)
