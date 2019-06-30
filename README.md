@@ -30,6 +30,8 @@ The options:
 
 - -j, --initial_magnitude : initial magnitude for initial parameters, default = 1
 
+- --reload, whether to reload existing processed data: 1: reload; 0: not reload, default=0
+
 - --quantile: whether to compute signal quantiles on each chromosome: 0: load existing file; 1: compute, default = 1
 
 - --miter: max number of iterations to perform, default =60
@@ -42,8 +44,10 @@ The options:
 
 - --output: output directory to save files, default = "." (the output files are saved in the current directory)
 
-Example: python phylo_hmrf.py -f 1 -n 20 (using Phylo-HMRF to estimate 20 states on syntenic regions on chromosome 1)
+Example: 
 
+python phylo_hmrf.py -n 20 -r 1 --reload 0 --chromvec 21,22 --miter 100 (using Phylo-HMRF to estimate 20 states on syntenic regions on chromosome 21 and chromosome 22)
+    
 For the provided example, the input includes four files: edge.1.txt, branch_length.1.txt, species_name.1.txt, chromosomeID.synteny.txt, and path_list.txt. Please follow the descriptions of the example input files to prepare the input files for your own study. Please keep the input files in the directory specified by the argument '-p' (or '--root_path'). The directory of the input data files are set to be the current working directory by default. For the current version of Phylo-HMRF, please use the same file names as used in the example.
 
 - edge.1.txt describes the topolopy of the phylogenetic tree. Phylo-HMRF uses binary trees. Please represent the phylogenetic tree in your study as a binary tree by showing the connectivity between a node and each of its children nodes. Please also add an initial ancestor node as the remote root node of the tree, in addition to the root node that exists in the phylogenetic tree of the clade of studied species. The nodes, including the remote root node, are numbered in the order of up-to-down and left-to-right and the index starts from 0. Therefore, node 0 represents the remote root node, and node 1 represents the root node of the phylogenetic tree of the clade of studied species. Each row of the edge.1.txt shows the indices of a pair of nodes, of which the first node is the parent node and the second node is one of its children. The provide example uses a phylogenetic tree with five leaf nodes (observed species).
