@@ -88,14 +88,13 @@ original predicted states in each synteny region indexed by regionID
 It is a matrix of size [window_size1*window_size2], where the window_size is shown in testChromID.region.txt.
 If there are N predicted states, states are indexed as 1-N.
 
-iv. estimate_testChromID.filtered.txt
+iv. estimate_testChromID.smooth.txt
 states after filtering small components (samll subregions with the same estimated states in the 2D contact map of a synteny region) with the neighboring predominant states
 The format is the same as estimate_testChromID.ori.txt
 
-v. estimate_testChromID.regionID.filtered.txt
+v. estimate_testChromID.regionID.smooth.txt
 states after filtering small components with the neighboring predominant states in each synteny region indexed by regionID
 The format is the same as estimate_testChromID.regionID.ori.txt
 
 vi. FILEIDX_chrChromID_region[regionID]_windowSize_iterID2.jpg
-visualization of the filtered state estimation results in estimate_testChromID.regionID.filtered.txt as a color image for each synteny region on each chromosome
-
+visualization of the smoothed state estimation results in estimate_testChromID.regionID.filtered.txt as a color image for each synteny region on each chromosome
