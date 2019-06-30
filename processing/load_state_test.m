@@ -21,7 +21,7 @@ chrom_num = length(chrom_vec);
 bin_size = 50000;
 n_iter = 1;
 filename_idx = 1;
-output_path = 'test1'; % please specify the directory to save the output files
+output_path = 'test2'; % please specify the directory to save the output files
 for i = 1:chrom_num
     chrom_id = chrom_vec(i);
     fprintf('chr%d\r\n',chrom_id);
@@ -38,7 +38,7 @@ for i = 1:chrom_num
     len_vec_1 = write_stateToFile_test(state_vec,len_vec,chrom_id,...
         bin_size,output_path,annotation);
     
-    annotation = 'filtered';
+    annotation = 'smooth';
     len_vec_2 = write_stateToFile_test(state_vec_filtered,len_vec,...
         chrom_id,bin_size,output_path,annotation);
     
