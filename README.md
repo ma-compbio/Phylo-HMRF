@@ -1,6 +1,6 @@
 # Phylo-HMRF
 
-Phylogenetic Hidden Markov Random Field model to perfomr comparison of chromatin interactions across multiple species
+Phylogenetic Hidden Markov Random Field model to perform comparison of chromatin interactions across multiple species
 
 The command to use Phylp-HMRF for evolutionary state estimation is as follows. 
 
