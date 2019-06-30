@@ -1,0 +1,100 @@
+## Description of the output file
+The output file named estimate_ou_RUNID_LABMDA_NCOMPONENT.mat includes the estimated states. The other output files are intermediate files used by the program. 
+
+The file estimate_ou_RUNID_LABMDA_NCOMPONENT.mat has several fields:
+1. state_vec: 
+Estimated hidden states at the iteration with the lowest cost since iteration 3 (please see iter_id2). It is a vector of size num_sample. The number of samples is the total of samples in each synteny block. The order of the samples in different synteny blocks is kept in 'len_vec', which is another field of the *.mat file.
+
+2. len_vec: 
+A matrix of size num_synteny_block*6. It consists of information of the synteny regions on each chromosome, size: num_regions by num_columns. Each row corresponds to one synteny block ion the Hi-C contact map. 
+
+The columns:
+column 1: number of samples in the each synteny region (calculated based on up-triangular matrix of the submatrix in the Hi-C contact map because the submatrix is symmetric; if the submatrix is insymmetric, i.e., representing the interaction of two different regions, the number of samples is calculated based on the entire submatrix)
+
+column 2: start index of the samples of the synteny region in the vector state_vec. The index starts from 0. The start index is included. 
+
+column 3: stop index of the samples of the synteny region in the vector state_vec. The index starts from 0. The stop index is included. 
+
+column 4: window size (hight) of the 2D contact map of the synteny region (unit:genmic bin size, e.g., 50Kb)
+
+column 5: window size (width) of the 2D contact map of the synteny region (unit:genomic bin size, e.g., 50Kb)
+
+column 6: the start index of region 1 on this chromosome, where region 1 corresponds to the interacting region associated with the height of the 2D contact map (unit:genmic bin size, index starts from 0).
+
+column 7: the start index of region 2 on this chromosome, where region 2 corresponds to the interacting region associated with the widthof the 2D contact map (unit:genmic bin size, index starts from 0). 
+If the 2D contact map represents interactions within the same region, column4=column5, column6=column7
+
+column 8: symteny region ID (index starts from 0) on this chromosome
+
+column 9: region type. 1: symmetric 2D contact map, representing interactions within the same region; 0: unsymmetric 2D contact map, representing interactions between two different regions
+
+column 10: chromosome ID, e.g., 1-22 for human genome
+
+If the synteny block is on the diagonal of the Hi-C contact map of the chromosome (i.e., we consider the interactions within a synteny region, then column4 = column5, and column6 = column7, column9 = 1
+
+If the the synteny block is off the diagonal of the Hi-C contact map of the chromosome (i.e., it represents the interactions between two non-overlapping regions, then column9 = 0.
+
+For example, if the k-th row is 15,10,25,5,5,10,10,0,1,1, it corresponds to the first synteny block on chr1. The synteny block has 15 samples, which are the 11th-25th elements of the vector state_vec. The corresponding 2D contact map is 5 by 5 in size. It reprsents interactions within the synteny block. We only keep elements in the up-triangular matrix of the contact map.    
+
+In our experiments, we only have two off-diagonal synteny blocks which are on chr3 and chr6 respectively. This is becuase we divided the original synteny block into two diagonal regions and one off-diagonal region to reduce computation cost, as the original synteny block is very large. The other synteny blocks on the Hi-C contact maps are all on the digonal and symmetric. 
+(For chr3 and chr6, the synteny region ID in column 8 is not changed though the original block has been divided into three parts. But for the testChromID.region.txt output using the code in the file folder processing, the regions are numbered as 1,2,3 for the divided subregions.)
+
+4. cost_vec: cost calculated using Graph Cuts algorithm at each iteration. It is a matrix of size num_iter*4. The four columns correspond to iteration index, pairwise cost, unary cost, and combined cost of pairwise cost and unary cost, respectively. 
+
+5. iter_id1: the index of iteration with the lowest cost. The starting index is 0.
+
+6. params_vec1: estimated paramters at iteration iter_id1.
+
+7. iter_id2: the index of iteration with the lowest cost since iteration 3. 
+
+8. params_vec2: estimated paramters at iteration iter_id2.
+
+## Post-processsing of the output file of state estimation
+We provide MATLAB code that could be used to extract the state estimation results from the output file and visualize the estimated states in the Hi-C contact map of each synteny block as a color image. 
+The code and auxiliary files are in the file folder processing.
+To use the code, please do the following steps:
+
+1. please specify several variables in the file load_state_test.m:
+please change the filename1 on Line 2 to the diretory of the output file estimate_ou_RUNID_LABMDA_NCOMPONENT.mat;
+please change the bin_size on Line 21 to the genomic bin size you used;
+please change the output_path on Line 24 to the directoy where you would like to save the processed files. The default output directory is file folder test1 (automatically created if there does not exist) in the currectory working directoy.
+
+2. please run load_state_test in MATLAB
+
+The output processed files include several types of files:
+
+i. testChromID.region.txt:
+Each row corresponds to one synteny region on the corresponding chromosome. 
+There are six chromosomes, which are the same as column 1-column 7 of the corresponding chromosome in len_vec of the output file estimate_ou_RUNID_LABMDA_NCOMPONENT.mat. 
+The difference is that the index starts from 1 in column 2 and column 3. 
+
+ii. estimate_testChromID.ori.txt
+original predicted states in all the synteny region on chromosome ChromID.
+Each row corresponds to a pair of interacting genomic loci
+column 1: chromsome ID of bin 1 in the pair of genomic loci
+column 2: start coordinate of bin 1
+column 3: stop coordinate of bin 1
+column 4: chromsome ID of bin 2 in the pair of genomic loci
+column 5: start coordinate of bin 2
+column 6: stop coordinate of bin 2
+column 7: estimated state of the interaction between bin 1 and bin 2 (index starts from 1)
+
+For example, one row is:
+22	18500000	18550000	22	16600000	16650000	18
+It represents the estimated state for interaction between chr22:18500000:18550000 and chr22:16600000	16650000 is state 18
+
+iii. estimate_testChromID.regionID.ori.txt
+original predicted states in each synteny region indexed by regionID
+It is a matrix of size [window_size1*window_size2], where the window_size is shown in testChromID.region.txt.
+If there are N predicted states, states are indexed as 1-N.
+
+iv. estimate_testChromID.filtered.txt
+states after filtering small components (samll subregions with the same estimated states in the 2D contact map of a synteny region) with the neighboring predominant states
+The format is the same as estimate_testChromID.ori.txt
+
+v. estimate_testChromID.regionID.filtered.txt
+states after filtering small components with the neighboring predominant states in each synteny region indexed by regionID
+The format is the same as estimate_testChromID.regionID.ori.txt
+
+vi. FILEIDX_chrChromID_region[regionID]_windowSize_iterID2.jpg
+visualization of the filtered state estimation results in estimate_testChromID.regionID.filtered.txt as a color image for each synteny region on each chromosome
