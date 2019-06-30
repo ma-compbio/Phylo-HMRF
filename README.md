@@ -62,6 +62,8 @@ The input files include: edge.1.txt, branch_length.1.txt, species_name.1.txt, ch
 
 - referenceSpecies.chrom.sizes shows the size of each chromosome of the genome of the reference speices which the Hi-C contacts in different species are aligned to. The file can be downloaded from the UCSC genome browser, named as genomeAssemblyID.chrom.sizes. 
 
+The first version of Phylo-HMRF is contained in the file folder phylo_hmrf_v1, which can be applied to state estimation on single chromosomes.
+
 ************************************************************************************
 # Required pre-installed packages
 Phylo-HMRF requires the following packages to be installed:
