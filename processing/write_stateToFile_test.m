@@ -1,11 +1,12 @@
 %% write state to files
-function state_vec = write_stateToFile_test(state_vec,len_vec_ori,chrom1,bin_size,output_path)
+function len_vec1 = write_stateToFile_test(state_vec,len_vec_ori,chrom1,...
+                                          bin_size,output_path,annotation)
   
 if ~exist(output_path, 'dir')
     mkdir(output_path);
 end
 
-filename = sprintf('%s/estimate_test%d.txt',output_path,chrom1);
+filename = sprintf('%s/estimate_test%d.%s.txt',output_path,chrom1,annotation);
 fid = fopen(filename,'w');
 
 b = len_vec_ori(:,end)==chrom1;
@@ -48,11 +49,11 @@ for region_id = 1:num_region
         t_state1a = t_state1a';
         t_state1a(id1) = t_state1;
         t_state1 = t_state1a;
-        b = find(pos(:,2)<=pos(:,1));
+        b = find(pos(:,2)>=pos(:,1));
         pos1 = [pos(b,1) pos(b,1)+bin];
         pos2 = [pos(b,2) pos(b,2)+bin];
     end
-    filename = sprintf('%s/estimate_test%d.%d.txt',output_path,chrom1,region_id);
+    filename = sprintf('%s/estimate_test%d.%d.%s.txt',output_path,chrom1,region_id,annotation);
     dlmwrite(filename,t_state1,'delimiter','\t','precision','%d');
     
     t_state = state_vec(b1);
@@ -72,6 +73,9 @@ fclose(fid);
 
 filename = sprintf('%s/test%d.region.txt',output_path,chrom1);
 dlmwrite(filename,len_vec1,'delimiter','\t','precision','%d');
+
+
+
 
 
 

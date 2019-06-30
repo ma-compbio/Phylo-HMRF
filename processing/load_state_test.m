@@ -1,5 +1,5 @@
 %% load the states
-filename1 = 'estimate_ou_1_4.00_20.mat'; % please specific the filename of state estimation results
+filename1 = 'estimate_ou_25_4.00_20.mat'; % please specific the filename of state estimation results
 data2 = load(filename1);
 state_vec = data2.state_vec + 1; % index starting from 1
 len_vec = double(data2.len_vec);
@@ -30,10 +30,21 @@ for i = 1:chrom_num
     
     %% load regional state vector
     len1 = size(state_vec,1);
-    [state_mtx_vec, len_vec1] = read_state_test(state_vec, chrom_id, ...
+    
+    [state_vec_filtered, len_vec1] = read_state_test(state_vec, chrom_id, ...
         len_vec,color_vec1,n_iter,n_component,filename_idx,iter,output_path);
     
-    state_vec = write_stateToFile_test(state_vec,len_vec,chrom_id,bin_size,output_path);
+    annotation = 'ori';
+    len_vec_1 = write_stateToFile_test(state_vec,len_vec,chrom_id,...
+        bin_size,output_path,annotation);
+    
+    annotation = 'filtered';
+    len_vec_2 = write_stateToFile_test(state_vec_filtered,len_vec,...
+        chrom_id,bin_size,output_path,annotation);
     
 end
+
+
+
+
 

@@ -1,5 +1,5 @@
 %%
-function [state_mtx_vec,len_vec1] = read_state_test(state_vec, chrom_id, ...
+function [state_vec_copy,len_vec1] = read_state_test(state_vec, chrom_id, ...
     len_vec, color_vec1, n_iter, n_component, filename_idx, iter_id, output_path)
 
 chrom = chrom_id;
@@ -12,6 +12,7 @@ end
 len_vec1 = len_vec(b,:);
 region_num = length(b);
 state_mtx_vec = cell(region_num,1);
+state_vec_copy = state_vec;
 
 if ~exist(output_path, 'dir')
     mkdir(output_path);
@@ -43,6 +44,14 @@ for k1 = 1:region_num
     mtx_1 = small_region_test(chrom,region_id,iter_id,color2,color_vec1,n_component,...
         window_size1,threshold,n_iter,sel_id,output_filename2);
     state_mtx = reshape(mtx_1,[window_size_1,window_size_2]);
+    sym_type = len_vec(region_id,9);
+    if sym_type==0
+        t_state = mtx_1(:);
+    else
+        id1a = index_sym1(window_size_1,window_size_2);
+        t_state = mtx_1(id1a);
+    end
+    state_vec_copy(id1:id2) = t_state;  % state_vec after filtering
     
     fprintf('%d %d %d %d %d\r\n',iter_id,chrom_id,region_id,id1,id2);
     
