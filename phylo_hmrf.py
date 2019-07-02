@@ -26,8 +26,6 @@ from numpy import linalg
 
 from scipy.optimize import minimize
 
-import pickle
-
 import pygco
 
 import sklearn.preprocessing
