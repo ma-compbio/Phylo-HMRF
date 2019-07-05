@@ -71,7 +71,7 @@ The first version of Phylo-HMRF is contained in the file folder phylo_hmrf_v1, w
 ************************************************************************************
 # Required pre-installed packages
 Phylo-HMRF requires the following packages to be installed:
-- Python (tested on version 2.7.12)
+- Python (tested on version 2.7.15)
 - scikit-learn (tested on version 0.18)
 - NumPy (tested on version 1.15.2)
 - SciPy (tested on version 0.18.0)
