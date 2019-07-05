@@ -42,7 +42,7 @@ The options:
 
 - --chromvec : chromosomes to perform estimation: -1: all the chromosomes for human, default = 1; To perform state estimation on multiple chromosomes, please use the format: chromID_1,chromID_2,...chromID_M, where the chromosome IDs are separated by commas.
 
-- --output: output directory to save files, default = "." (the output files are saved in the current directory)
+- --output : output directory to save files, default = "." (the output files are saved in the current directory)
 
 Example: 
 
