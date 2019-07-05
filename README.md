@@ -36,7 +36,7 @@ The options:
 
 - --miter : max number of iterations to perform, default =60
 
-- --resolution : genomic bin size, default = 50000
+- --resolution : genomic bin size (unit: base pair), default = 50000
 
 - --ref_species : genome assembly ID of the reference species, default = hg38
 
