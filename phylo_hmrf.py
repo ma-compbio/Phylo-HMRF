@@ -672,7 +672,6 @@ class phyloHMRF(_BaseGraph):
 			edge_weightList[k] = np.exp(-beta1*temp1)
 
 		b = np.where(edge_list_1[:,0]<edge_list_1[:,1])[0]
-		# print "id1<id2:%d"%(len(b))
 		edge_idList_undirected = edge_list_1[b]
 		edge_weightList_undirected = edge_weightList[b]
 
@@ -685,8 +684,6 @@ class phyloHMRF(_BaseGraph):
 		data1 = pd.DataFrame(columns=fields)
 		data1['start'], data1['stop'] = edge_idList_undirected[:,0], edge_idList_undirected[:,1]
 		data1['weight'] = edge_weightList_undirected
-		# data1['start'], data1['stop'] = edge_weightList_undirected[:,0], edge_weightList_undirected[:,1]
-		# data1['weight'] = edge_weightList_undirected[:,2]
 		data1.to_csv(filename,header=False,index=False,sep='\t')
 
 		print "edge weight output to file"
@@ -728,12 +725,7 @@ class phyloHMRF(_BaseGraph):
 	# construct connections from edge list
 	def _connected_edge(self,edge_list_1,n_samples):
 
-		# n_samples = self.n_samples
-		# neighbor_vec = [None]*n_samples
 		neighbor_edgeIdx = [None]*n_samples
-
-		# edge_index = dict()
-		# n_edges = len(self.edge_list_1)
 		n_edges = len(edge_list_1)
 
 		for i in range(0,n_samples):
@@ -1659,7 +1651,7 @@ class phyloHMRF(_BaseGraph):
 
 def parse_args():
 	parser = OptionParser(usage="Phylo-HMRF state estimation", add_help_option=False)
-	parser.add_option("-n", "--num_states", default="8", help="Set the number of states to estimate")
+	parser.add_option("-n", "--num_states", default="10", help="Set the number of states to estimate")
 	parser.add_option("-f","--chromosome", default="1", help="Chromosome name")
 	parser.add_option("-l","--length", default="one", help="Filename of length vectors")
 	parser.add_option("-p","--root_path", default=".", help="Root directory of the data files")
