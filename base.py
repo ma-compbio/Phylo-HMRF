@@ -19,9 +19,6 @@ import multiprocessing as mp
 
 import time
 
-#: Supported decoder algorithms.
-DECODER_ALGORITHMS = frozenset(("viterbi", "map"))
-
 class ConvergenceMonitor(object):
 	"""Monitors and reports convergence to :data:`sys.stderr`.
 
