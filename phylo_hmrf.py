@@ -125,15 +125,10 @@ class phyloHMRF(_BaseGraph):
 		self.path_vec = self._search_ancestor()
 
 		mtx = np.zeros((n_features,n_features))
-		# print "initilization, branch parameters", self.branch_params
-		# print "initilization, branch dim:", self.branch_dim
 		for i in range(0,self.branch_dim):
 			mtx += self.branch_params[i]*self.base_vec[i+1]
 
-		print mtx
 		self.cv_mtx = mtx
-		print self.leaf_time
-		# print self.params_vec1
 
 		#posteriors = np.random.rand(self.n_samples,n_components)
 		posteriors = np.ones((self.n_samples,n_components))
@@ -243,11 +238,7 @@ class phyloHMRF(_BaseGraph):
 			kmeans.fit(X1)
 			self.means_ = kmeans.cluster_centers_
 			init_label = kmeans.labels_
-			# self.init_label = kmeans.labels_
-			# self.labels = self.init_label.copy()
-			# self.labels_local = self.init_label.copy()
 			print "initialize parameters..."
-			# sample_ratio = 0.50
 			sample_ratio = 1.0
 
 			select_num1 = int(select_num*sample_ratio)
@@ -260,7 +251,6 @@ class phyloHMRF(_BaseGraph):
 			if sample_ratio<1:
 				self.init_label[id2] = kmeans.predict(X[id2])
 			
-			# self.init_label = kmeans.predict(X)
 			self.labels = self.init_label.copy()
 			self.labels_local = self.init_label.copy()
 
@@ -285,8 +275,6 @@ class phyloHMRF(_BaseGraph):
 		print "region %d neighbor_vec %d"%(region_id, len(self.neighbor_vec))
 
 		pairwise_potential = self._pairwise_compare(label)
-		# print "pairwise_potential", pairwise_potential.shape
-		# weighted_prob = np.exp(self.logprob - pairwise_potential)
 		weighted_prob = np.exp(logprob - pairwise_potential)
 		sum1 = np.sum(weighted_prob,axis=1).reshape((-1,1))
 		temp1 = np.dot(sum1,1.0*np.ones((1,self.n_components)))
@@ -323,7 +311,6 @@ class phyloHMRF(_BaseGraph):
 		stats = dict()
 		stats['post'] = posteriors.sum(axis=0)
 		stats['obs'] = np.dot(posteriors.T, X[s1:s2])
-		# stats['obs**2'] = np.zeros((self.n_components, self.n_features))
 		stats['obs*obs.T'] = np.einsum('ij,ik,il->jkl', posteriors, X[s1:s2], X[s1:s2])
 
 		# print "stats post", stats['post']
@@ -340,9 +327,6 @@ class phyloHMRF(_BaseGraph):
 		print region_id,s1,s2
 		labels, logprob = self.predict(X[s1:s2],region_id)
 		posteriors = self._compute_posteriors_graph1(X[s1:s2],labels,logprob,region_id)
-
-		# framelogprob = self.logprob
-		# self._accumulate_sufficient_statistics(stats, X[s1:s2], logprob, posteriors)
 		m_queue.put((region_id, labels, posteriors))
 
 		return True
@@ -353,8 +337,6 @@ class phyloHMRF(_BaseGraph):
 		edge_weightList = self.edge_weightList_undirected_vec[region_id]
 		edge_idList = self.edge_idList_undirected_vec[region_id]
 
-		# print("region %d neighbor_edgeIdx %d"%(region_id, len(neighbor_edgeIdx)))
-
 		pairwise_potential = self._pairwise_compare(label, neighbor_edgeIdx, edge_weightList, edge_idList)
 		
 		weighted_prob = np.exp(logprob - pairwise_potential)
@@ -363,7 +345,6 @@ class phyloHMRF(_BaseGraph):
 		posteriors = weighted_prob/temp1
 
 		pairwise_prob = np.exp(-pairwise_potential)
-		# print("pairwise_potential, pairwise_prob",pairwise_potential.shape, pairwise_prob.shape)
 		sum1 = np.sum(pairwise_prob,axis=1).reshape((-1,1))
 		temp2 = np.dot(sum1,1.0*np.ones((1,self.n_components)))
 		pairwise_prob_normalize = pairwise_prob/temp2
@@ -417,9 +398,7 @@ class phyloHMRF(_BaseGraph):
 	def _pairwise_compare(self, label, neighbor_edgeIdx, edge_weightList, edge_idList):
 		n_samples = len(label)
 		print "pairwise compare %d"%(n_samples)
-
-		# start = time.time()
-		#n = label.shape[0]	# the number of bins
+		
 		cost_vec = []
 		edge_idList = np.asarray(edge_idList)
 		for i in range(0,n_samples):
@@ -427,9 +406,6 @@ class phyloHMRF(_BaseGraph):
 			cost_vec.append(edge_potential)
 		
 		cost_vec = np.asarray(cost_vec)
-
-		# end = time.time()
-		# print("pairwise compare use time %s %s %s"%(start,end,end-start))
 
 		return cost_vec
 
@@ -462,7 +438,6 @@ class phyloHMRF(_BaseGraph):
 	def _pairwise_compare_ensemble(self, label, neighbor_edgeIdx, edge_weightList, edge_idList):
 		
 		n_samples = len(label)
-		#n = label.shape[0]	# the number of bins
 		cost_vec = np.zeros(n_samples)
 		for i in range(0,n_samples):
 			# edge_potential = self._pairwise_compare_single(label,i,neighbor_vec,neighbor_edgeIdx,edge_weightList)
@@ -497,17 +472,14 @@ class phyloHMRF(_BaseGraph):
 		# print "predicting states..."
 
 		len_vec = self.len_vec[region_id]
-		# n_samples, id1, id2, n_dim1, n_dim2, type_id1 = len_vec[0], len_vec[1], len_vec[2], len_vec[3], len_vec[4], len_vec[-2]
 		n_samples, id1, id2, n_dim1, n_dim2 = len_vec[0], len_vec[1], len_vec[2], len_vec[3], len_vec[4]
 														
 		edge_idList_undirected = self.edge_idList_undirected_vec[region_id]
 		edge_weightList_undirected = self.edge_weightList_undirected_vec[region_id]
-		# init_labels = self.labels[id1:id2].copy()
 		init_labels = self.labels_local[id1:id2].copy()
 		state, logprob = self._estimate_state_graphcuts_gco(X,init_labels,edge_idList_undirected,edge_weightList_undirected)
 
 		self.labels[id1:id2] = state
-		# self.logprob[id1:id2] = logprob
 		
 		return state, logprob
 	
@@ -516,8 +488,6 @@ class phyloHMRF(_BaseGraph):
 		print "estimating with graph cuts general gco..."
 		logprob = self._compute_log_likelihood(X)
 		unary_cost1 = -logprob.copy()
-
-		# print "unary cost max min median mean %.2f %.2f %.2f %.2f"%(np.max(unary_cost1),np.min(unary_cost1),np.median(unary_cost1),np.mean(unary_cost1))
 
 		max_cycles1 = 5000
 		print unary_cost1.shape
@@ -548,8 +518,6 @@ class phyloHMRF(_BaseGraph):
 				edge_prob[j,i] = edge_prob[i,j]
 				
 			edge_prob[i] = edge_prob[i]*1.0/sum(edge_prob[i])
-
-		# self.edge_prob = edge_prob
 
 		return edge_prob
 
@@ -589,8 +557,6 @@ class phyloHMRF(_BaseGraph):
 			# temp1 = difference
 			edge_weightList[k] = np.exp(-beta1*temp1)
 
-		#self.edge_weightList = edge_weightList
-
 		print edge_weightList.shape
 
 		filename = 'edge_weightList.txt'
@@ -603,13 +569,10 @@ class phyloHMRF(_BaseGraph):
 		print "edge weight undirected"
 
 		num_region = len(len_vec)
-		# edge_weightList_vec = [None]*num_region
 		edge_idList_undirected_vec = [None]*num_region
 		edge_weightList_undirected_vec = [None]*num_region
 
-		# neighbor_vec2 = [None]*num_region
 		neighbor_edgeIdx_vec = [None]*num_region
-		# edge_index_vec = [None]*num_region
 		beta1 = self.beta1
 
 		for id1 in range(0,num_region):
@@ -625,19 +588,12 @@ class phyloHMRF(_BaseGraph):
 			print edge_weightList_undirected[0:20]
 			edge_idList_undirected = np.int64(edge_list[:,0:2])
 
-			# neighbor_vec, neighbor_edgeIdx, edge_index = self._connected_edge(edge_list,n_samples)
-
 			neighbor_edgeIdx = self._connected_edge(edge_idList_undirected,n_samples)
 
-			# edge_weightList_vec[id1] = edge_weightList
 			edge_idList_undirected_vec[id1] = edge_idList_undirected
 			edge_weightList_undirected_vec[id1] = edge_weightList_undirected
 
-			# neighbor_vec2[id1] = neighbor_vec
 			neighbor_edgeIdx_vec[id1] = neighbor_edgeIdx
-			# edge_index_vec[id1] = edge_index
-
-		# return edge_weightList_vec, edge_idList_undirected_vec, edge_weightList_undirected_vec, neighbor_vec2, neighbor_edgeIdx_vec, edge_index_vec
 
 		return edge_weightList_undirected_vec, edge_idList_undirected_vec, neighbor_edgeIdx_vec
 
@@ -648,15 +604,12 @@ class phyloHMRF(_BaseGraph):
 		beta1 = self.beta1
 		n_samples = len(X)
 		n_edges = len(edge_list_1)
-		#beta1 = 0.1 # setting beta1 
 		edge_weightList = np.zeros(n_edges)
 
 		if n_edges%2!=0:
 			print "number of edges error! %d"%(n_edges)
 		
 		n_edges1 = int(n_edges/2)
-		# edge_weightList_undirected = np.ones(n_edges1).astype(np.float64)
-		# edge_idList_undirected = np.zeros((n_edges1,2)).astype(np.int64)	
 
 		eps = 1e-16 
 		X_norm = np.sqrt(np.sum(X*X,axis=1))
@@ -675,10 +628,6 @@ class phyloHMRF(_BaseGraph):
 		edge_idList_undirected = edge_list_1[b]
 		edge_weightList_undirected = edge_weightList[b]
 
-		# print edge_weightList.shape
-		# print edge_weightList.shape, edge_weightList_undirected.shape
-
-		#filename = 'edge_weightList_undirected%d.txt'%(position1)
 		filename = 'edge_weightList_undirected.txt'
 		fields = ['start','stop','weight']
 		data1 = pd.DataFrame(columns=fields)
@@ -688,7 +637,6 @@ class phyloHMRF(_BaseGraph):
 
 		print "edge weight output to file"
 
-		# return edge_weightList, edge_idList_undirected, edge_weightList_undirected
 		return edge_weightList_undirected, edge_idList_undirected
 
 	def _edge_weight_grid(self, edge_idList, edge_weightList):
@@ -733,12 +681,8 @@ class phyloHMRF(_BaseGraph):
 			neighbor_edgeIdx[i] = []
 
 		for id1 in range(0,n_edges):
-			#t_edge = self.edge_list_1[id1]
 			t_edge = edge_list_1[id1]
-			# i,j = t_edge[0], t_edge[1]	# j->i
 			j,i = t_edge[0], t_edge[1]	# j->i 
-			# edge_index[(j,i)] = id1
-			# neighbor_vec[i].append(j)
 			neighbor_edgeIdx[i].append(id1)
 			neighbor_edgeIdx[j].append(id1)
 		
@@ -798,8 +742,6 @@ class phyloHMRF(_BaseGraph):
 				# print "interior", node_vec
 
 		self.branch_vec[index] = node_vec  # all the leaf nodes that can be reached from this node
-		
-		# print "branch_dim", index, node_vec
 
 		return node_vec
 
@@ -895,7 +837,6 @@ class phyloHMRF(_BaseGraph):
 	def _search_ancestor(self):
 		path_vec = []        
 		tree_mtx = self.tree_mtx
-		# n = tree_mtx.shape[0]
 		n = self.leaf_vec.shape[0]
 		for i in range(0,n):
 			leaf_idx = self.leaf_vec[i]
@@ -938,9 +879,6 @@ class phyloHMRF(_BaseGraph):
 		pair_list, parent_list = [], [None]*n2
 
 		A1 = np.zeros((n1,n2))  # leaf node number by branch dim
-		# print "path_vec", self.path_vec
-		# for i in range(0,n1):
-		# 	print leaf_vec[i], self.path_vec[i]
 
 		for i in range(0,n2):
 			b = np.where(tree_mtx[:,i]>0)[0]
@@ -956,7 +894,6 @@ class phyloHMRF(_BaseGraph):
 		A2 = np.zeros((N1,N2))
 		cnt = 0
 		for i in range(0,n1):
-			# leaf_idx1 = leaf_vec[i]
 			vec1 = self.path_vec[i]
 			for j in range(i+1,n1):
 				# leaf_idx2 = leaf_vec[j]
@@ -990,7 +927,6 @@ class phyloHMRF(_BaseGraph):
 		covar_mtx = np.zeros((n1,n1))
 
 		num1 = self.branch_dim  # number of branches; assign parameters to each of the branches
-		# alpha, sigma, theta1 = params[0:num1], params[num1:2*num1], params1[2*num1:3*num1+1]
 		params1 = params[1:]
 		beta1, lambda1, theta1 = params1[0:num1], params1[num1:2*num1], params1[2*num1:3*num1+1]
 
@@ -1029,27 +965,20 @@ class phyloHMRF(_BaseGraph):
 		for i in range(0,n1):
 			covar_mtx[i,i] = values[self.leaf_vec[i],1] # variance
 		
-		# sigma1 = sigma**2
-		# V1 = 1.0/a1*np.exp(-a1*(T-cv))*(1-np.exp(-a1*cv))
 		V = covar_mtx.copy()
 		theta = theta1[self.leaf_vec]
 		mean_values1 = values[self.leaf_vec,0]
-		# obsmean = np.outer(self.stats['obs'][c], theta)
 		obsmean = np.outer(self.stats['obs'][c], mean_values1)
-		# print covar_mtx, theta
 
 		Sn_w = (self.stats['obs*obs.T'][c]
 				- obsmean - obsmean.T
 				+ np.outer(mean_values1, mean_values1)*self.stats['post'][c])
 
 		n_samples = self.n_samples
-		# weights_sum = stats['post'][c]
 		lik = self.stats['post'][c]*np.log(det(V))/n_samples+np.sum(inv(V)*Sn_w)/n_samples
 
 		self.values = values.copy()
 		self.cv_mtx = covar_mtx.copy()
-
-		# print "likelihood", state_id, lik
 
 		return lik
 
@@ -1062,13 +991,11 @@ class phyloHMRF(_BaseGraph):
 
 			values = np.zeros((n2,2))	# expectation and variance
 			covar_mtx = np.zeros((n1,n1))
-		
-			# alpha, sigma, theta1 = params[0:num1], params[num1:2*num1], params1[2*num1:3*num1+1]
+
 			params = params_vec[c,:]
 			params1 = params[1:]
 			beta1, lambda1, theta1 = params1[0:num1], params1[num1:2*num1], params1[2*num1:3*num1+1]
 
-			# b = np.where((lambda1<=1e-07&beta1<=1e-07)==True)[0]
 			b = np.where(beta1>1e-07)[0]
 			ratio1 = np.zeros(num1)
 			ratio1[b] = lambda1[b]/(2*beta1[b])
@@ -1112,13 +1039,10 @@ class phyloHMRF(_BaseGraph):
 	
 		n1, n2 = self.leaf_vec.shape[0], self.node_num  # number of leaf nodes, number of nodes		
 		c = state_id
-		# print "state_id: %d"%(state_id), params
 		flag = self._check_params(params)
 		if flag <= -2:
 			params = self.init_ou_params[state_id].copy()
 			lik = self._ou_lik_varied_constraint(params, state_id)
-			# print "nan in params restart: use initial parameter estimates %s"%(lik)
-			# print "nan1"
 
 			return lik
 
@@ -1166,9 +1090,7 @@ class phyloHMRF(_BaseGraph):
 		V = covar_mtx.copy()+self.min_covar*np.eye(self.n_features)
 		theta = theta1[self.leaf_vec]
 		mean_values1 = values[self.leaf_vec,0]
-		# obsmean = np.outer(self.stats['obs'][c], theta)
 		obsmean = np.outer(self.stats['obs'][c], mean_values1)
-		# print covar_mtx, theta
 
 		Sn_w = (self.stats['obs*obs.T'][c]
 				- obsmean - obsmean.T
@@ -1199,7 +1121,6 @@ class phyloHMRF(_BaseGraph):
 					# print V
 					# print det(V)
 					try:
-						# V = V+self.min_covar*np.eye(self.n_features)	# handle it
 						pinv_V = np.linalg.pinv(V)		# handle it
 						eps=1e-12
 						lik = (self.stats['post'][c]*np.log(det(V)+small_eps)/n_samples
@@ -1212,10 +1133,7 @@ class phyloHMRF(_BaseGraph):
 						break
 
 		self.values = values.copy()
-		# self.cv_mtx = covar_mtx.copy() + self.min_covar*np.eye(self.n_features)
 		self.cv_mtx = V.copy()
-
-		# print "likelihood", state_id, lik
 
 		return lik
 
@@ -1224,11 +1142,8 @@ class phyloHMRF(_BaseGraph):
 		n1, n2 = self.leaf_vec.shape[0], self.node_num  # number of leaf nodes, number of nodes
 		
 		c = state_id
-		# print "state_id: %d"%(state_id), params
 		flag = self._check_params(params)
 		if flag <= -1:
-			# print "state_id: %d"%(state_id), params
-			# raise Exception("nan in params")
 			params = self.init_ou_params[state_id].copy()
 			flag = self._check_params(params)
 			lik = np.nan
@@ -1237,7 +1152,6 @@ class phyloHMRF(_BaseGraph):
 			
 			return lik
 
-		# print("ou_lik_varied_constraint %d %d"%(state_id,flag))
 		values = np.zeros((n2,2))	# expectation and variance
 		covar_mtx = np.zeros((n1,n1))
 
@@ -1245,7 +1159,6 @@ class phyloHMRF(_BaseGraph):
 		params1 = params[1:]
 		beta1, lambda1, theta1 = params1[0:num1], params1[num1:2*num1], params1[2*num1:3*num1+1]
 
-		# b = np.where((lambda1<=1e-07&beta1<=1e-07)==True)[0]
 		b = np.where(beta1>1e-07)[0]
 		ratio1 = np.zeros(num1)
 		ratio1[b] = lambda1[b]/(2*beta1[b])
@@ -1283,9 +1196,7 @@ class phyloHMRF(_BaseGraph):
 		V = covar_mtx.copy()+self.min_covar*np.eye(self.n_features)
 		theta = theta1[self.leaf_vec]
 		mean_values1 = values[self.leaf_vec,0]
-		# obsmean = np.outer(self.stats['obs'][c], theta)
 		obsmean = np.outer(self.stats['obs'][c], mean_values1)
-		# print covar_mtx, theta
 
 		Sn_w = (self.stats['obs*obs.T'][c]
 				- obsmean - obsmean.T
@@ -1326,12 +1237,8 @@ class phyloHMRF(_BaseGraph):
 						flag1 = -1
 						break
 
-		# if flag1<=0:
-		# 	print "return from loop"
 		self.values = values.copy()
 		self.cv_mtx = V.copy()
-
-		# print "likelihood", state_id, lik
 
 		return lik
 
@@ -1344,7 +1251,6 @@ class phyloHMRF(_BaseGraph):
 		covar_mtx = np.zeros((n1,n1))
 
 		num1 = self.branch_dim  # number of branches; assign parameters to each of the branches
-		# alpha, sigma, theta1 = params[0:num1], params[num1:2*num1], params1[2*num1:3*num1+1]
 		params1 = params[1:]
 		beta1, lambda1, theta1 = params1[0:num1], params1[num1:2*num1], params1[2*num1:3*num1+1]
 
@@ -1359,8 +1265,6 @@ class phyloHMRF(_BaseGraph):
 
 		# add a branch to the first node
 		beta1, lambda1, ratio1 = np.insert(beta1,0,0), np.insert(lambda1,0,0), np.insert(ratio1,0,0)
-		
-		# print(p_idx,beta1,beta1_exp,lambda1,theta1,ratio1)
 		
 		for i in range(1,n2):
 			values[i,0] = values[p_idx[i],0]*beta1_exp[i] + theta1[i]*(1-beta1_exp[i])
@@ -1382,14 +1286,9 @@ class phyloHMRF(_BaseGraph):
 		for i in range(0,n1):
 			covar_mtx[i,i] = values[self.leaf_vec[i],1] # variance
 		
-		# sigma1 = sigma**2
-		# V1 = 1.0/a1*np.exp(-a1*(T-cv))*(1-np.exp(-a1*cv))
-		# V = covar_mtx.copy()
 		V = covar_mtx.copy()+self.min_covar*np.eye(self.n_features)
 		mean_values1 = values[self.leaf_vec,0]
 		n = obs.shape[0]
-		# obsmean = np.outer(self.stats['obs'][c], theta)
-		# obsmean = np.outer(n, mean_values1)
 		obsmean = np.outer(np.mean(obs,axis=0),mean_values1)
 
 		Sn_w = np.dot(obs.T,obs)/n - obsmean - obsmean.T + np.outer(mean_values1, mean_values1)
@@ -1409,10 +1308,6 @@ class phyloHMRF(_BaseGraph):
 					continue
 				else:
 					print "matrix not invertible! %d"%(cnt)
-					# print V
-					# print det(V)
-					# print params
-					# print "state_id: %d"%(state_id), params
 					try:
 						# V = V+self.min_covar*np.eye(self.n_features)	# handle it
 						pinv_V = np.linalg.pinv(V)		# handle it
@@ -1426,8 +1321,6 @@ class phyloHMRF(_BaseGraph):
 
 		self.values = values.copy()
 		self.cv_mtx = covar_mtx.copy() + self.min_covar*np.eye(self.n_features)
-
-		# print "likelihood ou varied single", lik
 
 		return lik
 
@@ -1512,16 +1405,12 @@ class phyloHMRF(_BaseGraph):
 	def _check_params(self, params):
 
 		num1 = self.branch_dim  # number of branches; assign parameters to each of the branches
-		# alpha, sigma, theta1 = params[0:num1], params[num1:2*num1], params1[2*num1:3*num1+1]
 		params1 = params[1:]
 		beta1, lambda1, theta1 = params1[0:num1], params1[num1:2*num1], params1[2*num1:3*num1+1]
 
 		# need to update the limit values
 		min1, max1 = 0, 1e02
 		min2, max2 = -1e02, 1e02
-
-		#flag1 = (beta1<min1)|(beta1>max1)|(lambda1<min1)|(lambda1>max1)
-		#flag2 = (theta1<min2)|(theta1>max2)
 
 		flag1 = (beta1>=min1)&(beta1<=max1)&(lambda1>=min1)&(lambda1<=max1)
 		flag2 = (theta1>=min2)&(theta1<=max2)
@@ -1567,9 +1456,6 @@ class phyloHMRF(_BaseGraph):
 		
 		p_idx = self.parent_list
 		leaf_vec = self.leaf_vec
-
-		# print "p_idx", p_idx
-		# print "leaf_vec", leaf_vec
 		
 		n2 = leaf_vec.shape[0]
 
@@ -1591,15 +1477,11 @@ class phyloHMRF(_BaseGraph):
 
 		initial_guess[self.n_params-n1:self.n_params] = mean_values1.copy() # initialize the mean values
 
-		# print "initial guess", initial_guess
-
 		return initial_guess
 
 	def _ou_optimize_init_unit(self, X, mean_values):
 
 		initial_guess = self._ou_init_guess(mean_values)
-
-		# print "initial guess", initial_guess
 		
 		method_vec = ['L-BFGS-B','BFGS','SLSQP','Nelder-Mead','Newton-CG']
 		id1 = 0
@@ -1643,9 +1525,6 @@ class phyloHMRF(_BaseGraph):
 
 		print self.params_vec1
 		print self.means_
-		# print self._covars_
-		# for c in range(self.n_components):
-		# 	print("%.4f\t")%(det(self._covars_[c]))
 		print("\n")
 
 
@@ -1727,7 +1606,6 @@ def run(num_states,chromvec,root_path,multiple,species_name,
 
 	# load the edge list
 	data_path = str(root_path)
-	# data_path = str(root_path)
 	filename2 = "%s/edge.1.txt"%(data_path)
 	if(os.path.exists(filename2)==True):
 		f = open(filename2, 'r')
@@ -1791,7 +1669,6 @@ def run(num_states,chromvec,root_path,multiple,species_name,
 	samples = []
 	len_vec = []
 	edge_list_vec = []
-	# output_path = "."	# directory to save the files
 	output_path = str(output_path)	# directory to save the files
 
 	start = time.time()
@@ -1829,14 +1706,9 @@ def run(num_states,chromvec,root_path,multiple,species_name,
 		stop2 = time.time()
 		print "use time save samples: %s"%(stop2-start)
 
-	# samples = np.asarray(samples)
 	print "load_data_chromosome2"
 	print samples.shape
 	print np.asarray(len_vec)
-
-	# if len(len_vec)<10:
-	# 	print "len_vec error!"
-	#	return False
 
 	start = time.time()
 	
@@ -1869,8 +1741,6 @@ def run(num_states,chromvec,root_path,multiple,species_name,
 
 		print "predicting states..."
 		mdict = {}
-		#mdict['params_vecList'] = params_vecList
-		#mdict['state_vecList'] = state_vecList
 		mdict['state_vec'] = state_vec
 		mdict['len_vec'] = len_vec
 		mdict['params_vec1'], mdict['params_vec2'], mdict['iter_id1'], mdict['iter_id2'], mdict['cost_vec'] = params_vec1, params_vec2, iter_id1, iter_id2, cost_vec
