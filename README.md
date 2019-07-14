@@ -14,7 +14,7 @@ The options:
 
 - -f, --chromosome : the name of the chromosome to estimate hidden states using Phylo-HMRF, default = 1
 
-- --num_neighbor : the number of neighbors of each node in the neighborhood system, default = 8
+- --num_neighbor : the number of neighbors of each node in the neighborhood system, default = 10
 
 - -g, --estimate_type : the choice to consider edge weights in pairwise potential: 0: not consider edge weights; 3: consider edge weights, default = 3
 
