@@ -24,11 +24,13 @@ The options:
 
 - -r, --run_id : experiment id, default = 0
 
-- -c, --cons_param : constraint parameter, default = 4
+- -c, --cons_param : L2-norm regularization parameter, default = 4
 
-- -i, --initial_weight : initial weight for initial parameters, default = 0.5
+- -i, --initial_weight : weight of initial parameters estimatd from K-means clustering for the parametr initialization in each maximization step, default = 0.5
 
 - -j, --initial_magnitude : initial magnitude for initial parameters, default = 1
+
+- -d, --initial_mode : initialization mode: 0: initial paramater values are all positive random; 1: initial selection strengths and Brownian motion intensities are poistive; initial optimal values can be negative, default = 0
 
 - --reload : whether to reload existing processed data: 1: reload; 0: not reload, default=0
 
