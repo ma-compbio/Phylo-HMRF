@@ -1,7 +1,7 @@
 ## Description of the output file
 The output file named estimate_ou_RUNID_LABMDA_NCOMPONENT.mat includes the estimated states. The other output files are intermediate files used by the program. 
 
-The file estimate_ou_RUNID_LABMDA_NCOMPONENT.mat has several fields:
+The file estimate_ou_RUNID_LAMBDA_NCOMPONENT.mat has several fields:
 1. state_vec: 
 Estimated hidden states at the iteration with the lowest cost since iteration 3 (please see iter_id2). It is a vector of size num_sample. The number of samples is the total of samples in each synteny block. The order of the samples in different synteny blocks is kept in 'len_vec', which is another field of the *.mat file.
 
@@ -57,7 +57,7 @@ To use the code, please do the following steps:
 1. please specify several variables in the file load_state_test.m:
 please change the filename1 on Line 2 to the diretory of the output file estimate_ou_RUNID_LABMDA_NCOMPONENT.mat;
 please change the bin_size on Line 21 to the genomic bin size you used;
-please change the output_path on Line 24 to the directoy where you would like to save the processed files. The default output directory is file folder test1 (automatically created if there does not exist) in the currectory working directoy.
+please change the output_path on Line 24 to the directoy where you would like to save the processed files. The default output directory is file folder test1 (automatically created if it does not exist) in the currectory working directoy.
 
 2. please run load_state_test in MATLAB
 
