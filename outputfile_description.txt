@@ -98,4 +98,4 @@ The format is the same as estimate_testChromID.regionID.ori.txt
 
 vi. FILEIDX_chrChromID_region[regionID]_windowSize_iterID2.jpg
 visualization of the smoothed state estimation results in estimate_testChromID.regionID.filtered.txt as a color image for each synteny region on each chromosome.
-The visualization is applicable to up to 30 staets. The RGB color values for each state (1-30) are stored in processing/color_vec.txt. Each line in color_vec.txt shows the R,G,B intensities (scale: 0-255) for the correspoinding state, respectively. If there are more than 30 estimated states or if you have preferences for RGB color of each state, please modify the file color_vec.txt accordingly by adding or changing the RGB color values.
+The visualization is applicable to up to 30 states. The RGB color values for each state (1-30) are stored in processing/color_vec.txt. Each line in color_vec.txt shows the R,G,B value (scale: 0-255) for the correspoinding state, respectively. If there are more than 30 estimated states or if you have preferences for RGB color of each state, please modify the file color_vec.txt accordingly by adding or changing the RGB color values.
