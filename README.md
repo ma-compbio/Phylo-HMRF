@@ -30,7 +30,7 @@ The options:
 
 - -j, --initial_magnitude : initial magnitude for initial parameters, default = 1
 
-- -d, --initial_mode : initialization mode: 0: initial paramater values are all positive random; 1: initial selection strengths and Brownian motion intensities are poistive; initial optimal values can be negative, default = 0
+- -d, --initial_mode : initialization mode: 0: initial paramater values are non-negative; 1: initial selection strengths and Brownian motion intensities are non-negative; initial optimal values can be negative, default = 0
 
 - --reload : whether to reload existing processed data: 1: reload; 0: not reload, default=0
 
