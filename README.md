@@ -26,7 +26,7 @@ The options:
 
 - -c, --cons_param : L2-norm regularization parameter, default = 4
 
-- -i, --initial_weight : weight of initial parameters estimatd from K-means clustering for the parametr initialization in each maximization step, default = 0.5
+- -i, --initial_weight : weight of initial parameters estimatd from K-means clustering for the parametr initialization in each maximization step, default = 0.3
 
 - -j, --initial_magnitude : initial magnitude for initial parameters, default = 1
 
