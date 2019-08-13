@@ -1,4 +1,4 @@
-hic_gorGor4
-hic_panTro5
-hic_panPan2
-hic_hg38
+example_input/test_data/hic_gorGor4
+example_input/test_data/hic_panTro5
+example_input/test_data/hic_panPan2
+example_input/test_data/hic_hg38
