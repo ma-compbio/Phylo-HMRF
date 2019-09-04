@@ -81,7 +81,7 @@ Phylo-HMRF requires the following packages to be installed:
 - NumPy (tested on version 1.15.2)
 - SciPy (tested on version 0.18.0)
 - pandas (tested on version 0.18.1)
-- Python wrapper for GCO library: pygco (Please refer to https://github.com/yujiali/pygco to install pygco)
+- Python wrapper for GCO library: pygco (Please refer to https://github.com/yujiali/pygco to install pygco; If you find that the original downloading link of gco-v3.0 package does not work, you could find a copy of the source code in the file folder gco_source. This copy was downloaded from https://github.com/Borda/pyGCO)
 - MedPy (tested on version 0.3.0)
 - scikit-image (tested on version 0.12.3)
 
