@@ -78,7 +78,7 @@ The first version of Phylo-HMRF is contained in the file folder phylo_hmrf_v1, w
 Phylo-HMRF requires the following packages to be installed:
 - Python (tested on version 2.7.15)
 - scikit-learn (tested on version 0.18)
-- NumPy (tested on version 1.15.2)
+- NumPy (tested on version 1.13.3)
 - SciPy (tested on version 0.18.0)
 - pandas (tested on version 0.18.1)
 - Python wrapper for GCO library: pygco (Please refer to https://github.com/yujiali/pygco to install pygco; If you find that the original downloading link of gco-v3.0 package does not work, you could find a copy of the source code in the file folder gco_source. This copy was downloaded from https://github.com/Borda/pyGCO)
