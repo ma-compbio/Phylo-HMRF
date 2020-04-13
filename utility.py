@@ -2473,7 +2473,7 @@ def quantile_contact(chrom,resolution,ref_filename,filename_list, species):
 	species_num = len(keys_vec)
 	m_vec = np.zeros((species_num,10))
 	eps = 1e-16
-	species = ['gorGor4','panTro5','panPan2','hg38']
+	# species = ['gorGor4','panTro5','panPan2','hg38']
 	for i in range(0,species_num):
 	# for species_id in keys_vec:
 		#species_id = keys_vec[i]
