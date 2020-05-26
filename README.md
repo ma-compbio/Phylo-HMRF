@@ -87,4 +87,10 @@ Phylo-HMRF requires the following packages to be installed:
 
 You could install the Anaconda (avilable from https://www.continuum.io/downloads) for convenience, which provides a open souce collection of widely used data science packages including Python and NumPy.
 
+************************************************************************************
+If you would like to cite Phylo-HMRF, please consider the following citation:
+
+Yang Yang, Yang Zhang, Bing Ren, Jesse R. Dixon, Jian Ma. (2019). "Comparing 3D genome organization in multiple species using Phylo-HMRF". Cell Systems 8(6):494-505.e14.
+
+
 
