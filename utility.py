@@ -828,6 +828,18 @@ def compare_labeling(label1, label2):
 # serial1 and serial2 need to be non-negative numbers
 def mapping_Idx(serial1,serial2):
 
+	if len(np.unique(serial1))<len(serial1):
+		print("error! ref_serial not unique", len(np.unique(serial1)), len(serial1))
+		return
+
+	unique_flag = 1
+	t_serial2 = np.unique(serial2,return_inverse=True)
+	if len(t_serial2[0])<len(serial2):
+		# print("serial2 not unique!")
+		serial2_ori = serial2.copy()	
+		serial2 = t_serial2[0]
+		unique_flag = 0
+
 	ref_serial = np.sort(serial1)
 	ref_sortedIdx = np.argsort(serial1)
 	ref_serial = np.int64(ref_serial)
@@ -845,7 +857,13 @@ def mapping_Idx(serial1,serial2):
 
 	idx = ref_sortedIdx[b]
 	idx1 = -np.ones(len(map_serial))
+	# print(len(ref_serial),len(map_serial))
+	# print(len(vec1),ref_serial[-1],map_serial[-1])
+	# print(len(b),len(b1),len(idx))
 	idx1[map_sortedIdx[b1]] = idx
+
+	if unique_flag==0:
+		idx1 = idx1[t_serial2[1]]
 
 	return np.int64(idx1)
 	
