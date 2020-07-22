@@ -386,7 +386,6 @@ def load_data_chromosome_sub1_2(chrom_id, x_max, x_min, resolution, num_neighbor
 	# this only applies if the reference genome is genome hg38
 	region_points_vec = np.asarray([[3,90279522,93797661],[6,57542947,61520508]])
 	b1 = np.where(region_points_vec[:,0]==chrom_id)[0]
-	
 	if len(b1)>0:
 		for id1 in b1:
 			region_points.append(region_points_vec[id1,1:])
