@@ -44,6 +44,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 matplotlib.pyplot.switch_backend('agg')
 
+THRESH1=1e-05
+
 def merge_contact_file(path1, output_filename1):
 
 	# filename1 = 'merge_contact_file.txt'
@@ -362,37 +364,33 @@ def load_data_chromosome_sub1_2(chrom_id, x_max, x_min, resolution, num_neighbor
 
 	# num_neighbor = 8
 	# print "num_neighbor: %d"%(num_neighbor)
-	type_id = 0
 
-	region_list = []
+	# region_list = []
+	region_points = []
 	# data_path = "inferCars/DATA/chrom"
-
 	# filename3 = "%s/chr%s.synteny.50.hg38.txt"%(data_path,chrom)
-	filename3 = "%s/chr%s.synteny.txt"%(data_path,chrom)
-	t_lenvec = np.loadtxt(filename3, dtype='int', delimiter='\t')	# load *.txt file
-	temp1 = np.ravel(t_lenvec)
+	# filename3 = "%s/chr%s.synteny.txt"%(data_path,chrom)
+	# t_lenvec = np.loadtxt(filename3, dtype='int', delimiter='\t')	# load *.txt file
+	# temp1 = np.ravel(t_lenvec)
 		
-	if len(temp1)<6:
-		region_list.append(t_lenvec)
-		region_num = 1
-	else:
-		region_num = len(t_lenvec)
-		for i in range(0,region_num):
-			region_list.append(t_lenvec[i])
-
-	print region_list
+	# if len(temp1)<6:
+	# 	region_list.append(t_lenvec)
+	# 	region_num = 1
+	# else:
+	# 	region_num = len(t_lenvec)
+	# 	for i in range(0,region_num):
+	# 		region_list.append(t_lenvec[i])
+	# print region_list
 
 	# handle the large chromosome size of chr3 and chr6 in genome hg38 
 	# this only applies if the reference genome is genome hg38
 	region_points_vec = np.asarray([[3,90279522,93797661],[6,57542947,61520508]])
 	b1 = np.where(region_points_vec[:,0]==chrom_id)[0]
-	region_points = []
 	
 	if len(b1)>0:
 		for id1 in b1:
 			region_points.append(region_points_vec[id1,1:])
-
-	print "region_points 1", region_points
+		print "region_points 1", region_points
 	# region_list1: start, stop, length, region_id
 	# region_list2: position1,position2,position1,position2,length,length,region_id,region_id1,chrom_id
 	region_list1, region_list2_ori = subregion1(filename3, chrom_id, resolution, region_points, type_id)
@@ -611,7 +609,7 @@ def near_interpolation1(mtx, window_size):
 	n1, n2 = mtx.shape[0], mtx.shape[1]
 	
 	h = int((window_size-1)/2)
-	threshold = 1e-05
+	threshold = THRESH1
 	cnt1 = 0
 	cnt2 = 0
 	for i in range(2,n1-1):
@@ -641,7 +639,7 @@ def near_interpolation1a(mtx, window_size):
 	n1, n2 = mtx.shape[0], mtx.shape[1]
 	
 	h = int((window_size-1)/2)
-	threshold = 1e-05
+	threshold = THRESH1
 	cnt1 = 0
 	cnt2 = 0
 	for i in range(2,n1-1):
@@ -670,7 +668,7 @@ def near_interpolation2(mtx, window_size):
 	n1, n2 = mtx.shape[0], mtx.shape[1]
 	
 	h = int((window_size-1)/2)
-	threshold = 1e-05
+	threshold = THRESH1
 	cnt1 = 0
 	cnt2 = 0
 	for i in range(2,n1-1):
@@ -1348,7 +1346,6 @@ def select_valuesPosition1_2(position, x, output_filename, position1, position2,
 	b1 = np.where(b==True)[0]
 	thresh = 0
 
-	thresh = 0
 	num1 = x.shape[1]
 	cnt_vec = np.zeros(num1)
 	for i in range(0,num1):
@@ -1447,15 +1444,15 @@ def write_matrix_image_Ctrl_v2(value, pos, output_filename1, output_filename2, n
 	dim1 = value.shape[-1]
 	for i in range(0,dim1):
 		temp1 = value[:,i]
-		b = np.where(temp1>1e-05)[0]
-		print "species %d: %d %.4f"%(i,len(b),np.mean(temp1[b]))
+		b = np.where(temp1>THRESH1)[0]
+		# print "species %d: %d %.4f"%(i,len(b),np.mean(temp1[b]))
 		
 	mtx1, start_region = write_matrix_image_v1(value, pos, output_filename1)
 
 	for k in range(0,dim1):
 		temp1 = mtx1[:,:,k]
 		x1 = np.ravel(temp1)
-		b2 = np.where(x1>1e-05)[0]
+		b2 = np.where(x1>THRESH1)[0]
 		# print "after write_matrix_image_v1"
 		# print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
 
@@ -1465,7 +1462,7 @@ def write_matrix_image_Ctrl_v2(value, pos, output_filename1, output_filename2, n
 	for k in range(0,dim1):
 		temp1 = m1[:,k]
 		x1 = np.ravel(temp1)
-		b2 = np.where(x1>1e-05)[0]
+		b2 = np.where(x1>THRESH1)[0]
 		# print "after reshape"
 		# print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
 
@@ -1475,12 +1472,12 @@ def write_matrix_image_Ctrl_v2(value, pos, output_filename1, output_filename2, n
 	window_size = 3
 	for i in range(0,dim1):
 		temp1 = mtx1[:,:,i]
-		b = np.where(temp1<1e-05)[0]
+		b = np.where(temp1<THRESH1)[0]
 		# print "species %d: %d"%(i,len(b))
 		mtx1[:,:,i] = near_interpolation1(temp1, window_size)	# use median of neighbors for interpolation 
 
 		temp2 = mtx1[:,:,i]
-		b = np.where(temp2<1e-05)[0]
+		b = np.where(temp2<THRESH1)[0]
 		# print "2 species %d: %d"%(i,len(b))
 
 	m1 = mtx1.reshape((mtx1.shape[0]*mtx1.shape[1],dim1))
@@ -1528,8 +1525,8 @@ def write_matrix_image_Ctrl_unsym1(value, pos, output_filename1, output_filename
 
 	for i in range(0,dim1):
 		temp1 = value[:,i]
-		b = np.where(temp1>1e-05)[0]
-		print "species %d: %d %.4f"%(i,len(b),np.mean(temp1[b]))
+		b = np.where(temp1>THRESH1)[0]
+		print "species %d: %d %.4f"%(i,len(b))
 		
 	# write value to matrix
 	mtx1, start_region = write_matrix_image_v1(value, pos, output_filename1)
@@ -1537,7 +1534,7 @@ def write_matrix_image_Ctrl_unsym1(value, pos, output_filename1, output_filename
 	for k in range(0,dim1):
 		temp1 = mtx1[:,:,k]
 		x1 = np.ravel(temp1)
-		b2 = np.where(x1>1e-05)[0]
+		b2 = np.where(x1>THRESH1)[0]
 		# print "after write_matrix_image_v1"
 		# print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
 
@@ -1547,7 +1544,7 @@ def write_matrix_image_Ctrl_unsym1(value, pos, output_filename1, output_filename
 	for k in range(0,dim1):
 		temp1 = m1[:,k]
 		x1 = np.ravel(temp1)
-		b2 = np.where(x1>1e-05)[0]
+		b2 = np.where(x1>THRESH1)[0]
 		# print "after reshape"
 		# print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
 
@@ -1558,12 +1555,12 @@ def write_matrix_image_Ctrl_unsym1(value, pos, output_filename1, output_filename
 	window_size = 3
 	for i in range(0,dim1):
 		temp1 = mtx1[:,:,i]
-		b = np.where(temp1<1e-05)[0]
+		b = np.where(temp1<THRESH1)[0]
 		print "species %d: %d"%(i,len(b))
 		mtx1[:,:,i] = near_interpolation1(temp1, window_size)	# use median of neighbors for interpolation 
 
-		temp2 = mtx1[:,:,i]
-		b = np.where(temp2<1e-05)[0]
+		# temp2 = mtx1[:,:,i]
+		# b = np.where(temp2<THRESH1)[0]
 		# print "2 species %d: %d"%(i,len(b))
 
 	m1 = mtx1.reshape((mtx1.shape[0]*mtx1.shape[1],dim1))
@@ -1612,8 +1609,8 @@ def write_matrix_image_Ctrl_unsym1_position(value, pos, output_filename1, output
 
 	for i in range(0,dim1):
 		temp1 = value[:,i]
-		b = np.where(temp1>1e-05)[0]
-		print "species %d: %d %.4f"%(i,len(b),np.mean(temp1[b]))
+		b = np.where(temp1>THRESH1)[0]
+		# print "species %d: %d %.4f"%(i,len(b),np.mean(temp1[b]))
 		
 	# write value to matrix
 	# mtx1, start_region = write_matrix_image_v1(value, pos, output_filename1)
@@ -1622,7 +1619,7 @@ def write_matrix_image_Ctrl_unsym1_position(value, pos, output_filename1, output
 	for k in range(0,dim1):
 		temp1 = mtx1[:,:,k]
 		x1 = np.ravel(temp1)
-		b2 = np.where(x1>1e-05)[0]
+		b2 = np.where(x1>THRESH1)[0]
 		# print "after write_matrix_image_v1"
 		# print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
 
@@ -1632,7 +1629,7 @@ def write_matrix_image_Ctrl_unsym1_position(value, pos, output_filename1, output
 	for k in range(0,dim1):
 		temp1 = m1[:,k]
 		x1 = np.ravel(temp1)
-		b2 = np.where(x1>1e-05)[0]
+		b2 = np.where(x1>THRESH1)[0]
 		# print "after reshape"
 		# print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
 
@@ -1643,12 +1640,12 @@ def write_matrix_image_Ctrl_unsym1_position(value, pos, output_filename1, output
 	window_size = 3
 	for i in range(0,dim1):
 		temp1 = mtx1[:,:,i]
-		b = np.where(temp1<1e-05)[0]
+		b = np.where(temp1<THRESH1)[0]
 		# print "species %d: %d"%(i,len(b))
 		# mtx1[:,:,i] = near_interpolation1(temp1, window_size)	# use median of neighbors for interpolation 
 
 		temp2 = mtx1[:,:,i]
-		b = np.where(temp2<1e-05)[0]
+		b = np.where(temp2<THRESH1)[0]
 		# print "2 species %d: %d"%(i,len(b))
 
 	m1 = mtx1.reshape((mtx1.shape[0]*mtx1.shape[1],dim1))
@@ -1712,8 +1709,8 @@ def write_matrix_image_Ctrl_sym1(value, pos, output_filename1, output_filename2,
 	dim1 = value.shape[-1]
 	for i in range(0,dim1):
 		temp1 = value[:,i]
-		b = np.where(temp1>1e-05)[0]
-		print "species %d: %d %.4f"%(i,len(b),np.mean(temp1[b]))
+		b = np.where(temp1>THRESH1)[0]
+		# print "species %d: %d %.4f"%(i,len(b),np.mean(temp1[b]))
 		
 	# mtx1, start_region = write_matrix_image_v1(value, pos, output_filename1)
 	mtx1, start_region1, start_region2 = write_matrix_image_v1a(value, pos, output_filename1)
@@ -1721,7 +1718,7 @@ def write_matrix_image_Ctrl_sym1(value, pos, output_filename1, output_filename2,
 	for k in range(0,dim1):
 		temp1 = mtx1[:,:,k]
 		x1 = np.ravel(temp1)
-		b2 = np.where(x1>1e-05)[0]
+		b2 = np.where(x1>THRESH1)[0]
 		# print "after write_matrix_image_v1"
 		# print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
 
@@ -1731,7 +1728,7 @@ def write_matrix_image_Ctrl_sym1(value, pos, output_filename1, output_filename2,
 	for k in range(0,dim1):
 		temp1 = m1[:,k]
 		x1 = np.ravel(temp1)
-		b2 = np.where(x1>1e-05)[0]
+		b2 = np.where(x1>THRESH1)[0]
 		# print "after reshape"
 		# print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
 
@@ -1741,12 +1738,12 @@ def write_matrix_image_Ctrl_sym1(value, pos, output_filename1, output_filename2,
 	window_size = 3
 	for i in range(0,dim1):
 		temp1 = mtx1[:,:,i]
-		b = np.where(temp1<1e-05)[0]
+		b = np.where(temp1<THRESH1)[0]
 		# print "species %d: %d"%(i,len(b))
 		mtx1[:,:,i] = near_interpolation1a(temp1, window_size)	# use median of neighbors for interpolation 
 
 		temp2 = mtx1[:,:,i]
-		b = np.where(temp2<1e-05)[0]
+		b = np.where(temp2<THRESH1)[0]
 		# print "2 species %d: %d"%(i,len(b))
 
 	m1 = mtx1.reshape((mtx1.shape[0]*mtx1.shape[1],dim1))
@@ -1793,15 +1790,15 @@ def write_matrix_image_Ctrl_v2_unprocess(value, pos, output_filename1, output_fi
 	dim1 = value.shape[-1]
 	for i in range(0,dim1):
 		temp1 = value[:,i]
-		b = np.where(temp1>1e-05)[0]
-		print "species %d: %d %.4f"%(i,len(b),np.mean(temp1[b]))
+		b = np.where(temp1>THRESH1)[0]
+		# print "species %d: %d %.4f"%(i,len(b),np.mean(temp1[b]))
 		
 	mtx1, start_region = write_matrix_image_v1(value, pos, output_filename1)
 
 	for k in range(0,dim1):
 		temp1 = mtx1[:,:,k]
 		x1 = np.ravel(temp1)
-		b2 = np.where(x1>1e-05)[0]
+		b2 = np.where(x1>THRESH1)[0]
 		# print "after write_matrix_image_v1"
 		# print k, len(x1), len(b2), np.mean(x1), np.median(x1), np.max(x1), np.mean(x1[b2]), np.median(x1[b2])	
 
@@ -2201,8 +2198,8 @@ def write_matrix_image_v1(value, pos, output_filename1):
 	x1 = value
 	dim1,dim2 = x1.shape[0], x1.shape[-1]
 	for k in range(0,dim2):
-		b2 = np.where(x1[:,k]>1e-05)[0]
-		print k, dim1, len(b2), np.mean(x1[:,k]), np.median(x1[:,k]), np.max(x1[:,k]), np.mean(x1[b2,k]), np.median(x1[b2,k])	
+		b2 = np.where(x1[:,k]>THRESH1)[0]
+		print k, dim1, len(b2), np.mean(x1[:,k]), np.median(x1[:,k]), np.max(x1[:,k])
 
 	print value.shape
 
@@ -2240,7 +2237,7 @@ def write_matrix_image_v1_mask(value, pos, output_filename1):
 	x1 = value
 	dim1,dim2 = x1.shape[0], x1.shape[-1]
 	for k in range(0,dim2):
-		b2 = np.where(x1[:,k]>1e-05)[0]
+		b2 = np.where(x1[:,k]>THRESH1)[0]
 		print k, dim1, len(b2), np.mean(x1[:,k]), np.median(x1[:,k]), np.max(x1[:,k]), np.mean(x1[b2,k]), np.median(x1[b2,k])	
 
 	print value.shape
@@ -2341,8 +2338,8 @@ def write_matrix_image_v1a(value, pos, output_filename1):
 	x1 = value
 	dim1,dim2 = x1.shape[0], x1.shape[-1]
 	for k in range(0,dim2):
-		b2 = np.where(x1[:,k]>1e-05)[0]
-		print k, dim1, len(b2), np.mean(x1[:,k]), np.median(x1[:,k]), np.max(x1[:,k]), np.mean(x1[b2,k]), np.median(x1[b2,k])	
+		b2 = np.where(x1[:,k]>THRESH1)[0]
+		# print k, dim1, len(b2), np.mean(x1[:,k]), np.median(x1[:,k]), np.max(x1[:,k]), np.mean(x1[b2,k]), np.median(x1[b2,k])	
 
 	print value.shape
 
