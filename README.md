@@ -69,7 +69,7 @@ We also provide small size test data in example_input/test_data/, which are the 
 
 Please see outputfile_description.txt for the descriptions of the output file. We also provide MATLAB code that could be used to extract the state estimation results from the output file and visualize the estimated states in the Hi-C contact map of each synteny block as a color image. Please see the code in the file folder processing.
 
-Please comment or modify Line 387-392 in utility.py according to the species studied. In our study, we divided the large-size synteny regions on chr3 and chr6 of genome hg38 according to the chromosome arms, respectively. However, this only applies to genome hg38. If the reference genome is different, Line 387-392 need to be changed accordingly.
+Please comment or modify Line 381-390 in utility.py according to the species studied. In our study, we divided the large-size synteny regions on chr3 and chr6 of genome hg38 according to the chromosome arms, respectively. However, this only applies to genome hg38. If the reference genome is different, Line 381-390 need to be changed accordingly.
 
 The first version of Phylo-HMRF is contained in the file folder phylo_hmrf_v1, which can be applied to state estimation on single chromosomes.
 
