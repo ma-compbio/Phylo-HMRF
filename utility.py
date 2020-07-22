@@ -362,9 +362,6 @@ def load_data_chromosome_sub1_2(chrom_id, x_max, x_min, resolution, num_neighbor
 	# log transformation
 	x = np.log(1+x1)
 
-	# num_neighbor = 8
-	# print "num_neighbor: %d"%(num_neighbor)
-
 	# region_list = []
 	region_points = []
 	# data_path = "inferCars/DATA/chrom"
@@ -372,7 +369,6 @@ def load_data_chromosome_sub1_2(chrom_id, x_max, x_min, resolution, num_neighbor
 	# filename3 = "%s/chr%s.synteny.txt"%(data_path,chrom)
 	# t_lenvec = np.loadtxt(filename3, dtype='int', delimiter='\t')	# load *.txt file
 	# temp1 = np.ravel(t_lenvec)
-		
 	# if len(temp1)<6:
 	# 	region_list.append(t_lenvec)
 	# 	region_num = 1
@@ -382,7 +378,9 @@ def load_data_chromosome_sub1_2(chrom_id, x_max, x_min, resolution, num_neighbor
 	# 		region_list.append(t_lenvec[i])
 	# print region_list
 
-	# handle the large chromosome size of chr3 and chr6 in genome hg38 
+	# handle the large synteny block size of chr3 and chr6 in genome hg38
+	# region_points_vec stores the centromere positions of chr3 and chr6 in genome hg38
+	# the large-size synteny blocks on chr3 and chr6 are diveided into smaller parts according to the centromere positions
 	# this only applies if the reference genome is genome hg38
 	region_points_vec = np.asarray([[3,90279522,93797661],[6,57542947,61520508]])
 	b1 = np.where(region_points_vec[:,0]==chrom_id)[0]
