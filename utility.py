@@ -366,7 +366,7 @@ def load_data_chromosome_sub1_2(chrom_id, x_max, x_min, resolution, num_neighbor
 	region_points = []
 	# data_path = "inferCars/DATA/chrom"
 	# filename3 = "%s/chr%s.synteny.50.hg38.txt"%(data_path,chrom)
-	# filename3 = "%s/chr%s.synteny.txt"%(data_path,chrom)
+	filename3 = "%s/chr%s.synteny.txt"%(data_path,chrom)
 	# t_lenvec = np.loadtxt(filename3, dtype='int', delimiter='\t')	# load *.txt file
 	# temp1 = np.ravel(t_lenvec)
 	# if len(temp1)<6:
@@ -1523,7 +1523,7 @@ def write_matrix_image_Ctrl_unsym1(value, pos, output_filename1, output_filename
 	for i in range(0,dim1):
 		temp1 = value[:,i]
 		b = np.where(temp1>THRESH1)[0]
-		print "species %d: %d %.4f"%(i,len(b))
+		print "species %d: %d"%(i,len(b))
 		
 	# write value to matrix
 	mtx1, start_region = write_matrix_image_v1(value, pos, output_filename1)
